@@ -1,0 +1,1698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>¿Hablas Español? — Linguavita</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#F5F0E8;--ivory:#FDFAF4;
+    --red:#8B1A1A;--red-mid:#A52020;--red-deep:#6B0F0F;
+    --gold:#C9A84C;--gold-light:#E8D5A0;--gold-pale:#F5EDD4;
+    --yellow:#D4A017;--yellow-light:#EDD98A;
+    --sage:#6B7F5A;--navy:#1C2B4A;
+    --text:#2C1810;--text-light:#6B4E3D;--border:rgba(201,168,76,0.3);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Jost',sans-serif;background:var(--cream);color:var(--text);min-height:100vh;position:relative;overflow-x:hidden;}
+  body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 10% 20%,rgba(139,26,26,0.07) 0%,transparent 50%),radial-gradient(ellipse at 90% 80%,rgba(201,168,76,0.07) 0%,transparent 50%);pointer-events:none;z-index:0;}
+  body::after{content:'❧';position:fixed;bottom:20px;right:28px;font-size:2rem;color:var(--gold);opacity:0.25;pointer-events:none;}
+  header{text-align:center;padding:2rem 2rem 1.2rem;position:relative;z-index:1;border-bottom:1px solid var(--border);}
+  .header-ornament{font-family:'Cormorant Garamond',serif;font-style:italic;color:var(--gold);font-size:0.85rem;letter-spacing:0.3em;text-transform:uppercase;margin-bottom:0.4rem;opacity:0.9;}
+  h1{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,5vw,3rem);color:var(--red);font-weight:700;}
+  h1 em{font-style:italic;color:var(--red-mid);}
+  .subtitle{font-family:'Cormorant Garamond',serif;font-size:1rem;color:var(--text-light);margin-top:0.3rem;letter-spacing:0.08em;}
+  .save-indicator{font-size:0.7rem;letter-spacing:0.1em;color:var(--sage);margin-top:0.3rem;opacity:0;transition:opacity 0.5s;}
+  .save-indicator.show{opacity:1;}
+  .progress-section{max-width:700px;margin:1.2rem auto 0;padding:0 1.5rem;position:relative;z-index:1;}
+  .progress-label{display:flex;justify-content:space-between;font-size:0.78rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-light);margin-bottom:0.5rem;}
+  .progress-bar-outer{height:6px;background:rgba(201,168,76,0.2);border-radius:3px;overflow:hidden;}
+  .progress-bar-inner{height:100%;background:linear-gradient(90deg,var(--red),var(--gold));border-radius:3px;transition:width 0.5s ease;}
+  .stats-row{display:flex;justify-content:center;gap:1rem;margin-top:0.8rem;flex-wrap:wrap;}
+  .stat{text-align:center;}
+  .stat-num{font-family:'Playfair Display',serif;font-size:1.3rem;color:var(--red);display:block;}
+  .stat-label{font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-light);}
+  .streak-badge{display:inline-flex;align-items:center;gap:0.4rem;background:rgba(201,168,76,0.15);border:1px solid var(--gold);border-radius:20px;padding:0.3rem 0.9rem;font-size:0.8rem;color:var(--red);margin-top:0.6rem;}
+  .streak-badge.active{background:rgba(201,168,76,0.3);}
+  .streak-today{text-align:center;font-size:0.72rem;color:var(--sage);margin-top:0.4rem;min-height:1rem;}
+  nav{display:flex;justify-content:center;max-width:720px;margin:1.5rem auto 0;padding:0 1.5rem;position:relative;z-index:1;border:1px solid var(--border);border-radius:2px;overflow:hidden;}
+  .tab-btn{flex:1;padding:0.6rem 0.1rem;background:transparent;border:none;border-right:1px solid var(--border);font-family:'Jost',sans-serif;font-size:0.6rem;font-weight:500;letter-spacing:0.05em;text-transform:uppercase;color:var(--text-light);cursor:pointer;transition:all 0.2s;}
+  .tab-btn:last-child{border-right:none;}
+  .tab-btn.active{background:var(--red);color:var(--gold-light);}
+  .tab-btn:not(.active):hover{background:rgba(139,26,26,0.06);color:var(--red);}
+  main{max-width:700px;margin:1.5rem auto;padding:0 1.5rem 4rem;position:relative;z-index:1;}
+  .panel{display:none;}.panel.active{display:block;}
+  /* FLASHCARDS */
+  .flashcard-controls{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:0.5rem;}
+  .category-select{font-family:'Jost',sans-serif;font-size:0.75rem;padding:0.4rem 0.8rem;border:1px solid var(--border);background:var(--ivory);color:var(--red);border-radius:2px;cursor:pointer;outline:none;}
+  .fc-counter{font-family:'Cormorant Garamond',serif;font-style:italic;color:var(--text-light);font-size:0.92rem;}
+  .flashcard-scene{perspective:1000px;-webkit-perspective:1000px;cursor:pointer;margin-bottom:1.2rem;min-height:300px;}
+  .flashcard{width:100%;min-height:300px;position:relative;transform-style:preserve-3d;-webkit-transform-style:preserve-3d;transition:transform 0.55s cubic-bezier(0.4,0,0.2,1);}
+  .flashcard.flipped{transform:rotateY(180deg);-webkit-transform:rotateY(180deg);}
+  .fc-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border:1px solid var(--border);border-radius:3px;background:var(--ivory);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1.8rem;box-shadow:0 4px 30px rgba(139,26,26,0.08),inset 0 0 0 6px var(--cream);}
+  .fc-back{transform:rotateY(180deg);-webkit-transform:rotateY(180deg);background:var(--red);box-shadow:0 4px 30px rgba(139,26,26,0.2),inset 0 0 0 6px rgba(255,255,255,0.05);}
+  .fc-hint{position:absolute;top:0.8rem;right:1rem;font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-light);opacity:0.6;}
+  .fc-back .fc-hint{color:rgba(255,255,255,0.4);}
+  .fc-srs-info{position:absolute;top:0.8rem;left:1rem;font-size:0.65rem;color:var(--gold);opacity:0.8;}
+  .fc-category{font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);margin-bottom:0.6rem;}
+  .fc-word{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,5vw,2.8rem);color:var(--red);text-align:center;line-height:1.1;}
+  .fc-back .fc-word{color:var(--gold-light);}
+  .fc-pronunciation{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1rem;color:var(--text-light);margin-top:0.3rem;}
+  .fc-back .fc-pronunciation{color:rgba(255,255,255,0.5);}
+  .fc-translation{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:300;color:rgba(255,255,255,0.85);margin-top:0.3rem;text-align:center;}
+  .fc-example{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:0.88rem;color:rgba(255,255,255,0.5);margin-top:0.5rem;text-align:center;max-width:300px;}
+  .fc-grammar-tip{background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.3);border-radius:4px;padding:0.5rem 0.8rem;margin-top:0.7rem;font-size:0.78rem;color:var(--gold-light);text-align:center;max-width:320px;line-height:1.4;}
+  .fc-grammar-tip strong{color:var(--gold);display:block;font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;margin-bottom:0.2rem;}
+  .audio-btn{margin-top:0.8rem;background:rgba(201,168,76,0.15);border:1px solid rgba(201,168,76,0.4);border-radius:50%;width:40px;height:40px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s;color:var(--gold);font-size:1rem;}
+  .audio-btn:hover{background:rgba(201,168,76,0.3);transform:scale(1.05);}
+  .fc-nav{display:flex;align-items:center;justify-content:center;gap:0.4rem;margin-top:0.8rem;flex-wrap:wrap;}
+  .btn{font-family:'Jost',sans-serif;font-size:0.7rem;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;padding:0.55rem 0.9rem;border-radius:2px;border:1px solid transparent;cursor:pointer;transition:all 0.2s;}
+  .btn-primary{background:var(--red);color:var(--gold-light);border-color:var(--red);}
+  .btn-primary:hover{background:var(--red-deep);}
+  .btn-outline{background:transparent;color:var(--red);border-color:var(--border);}
+  .btn-outline:hover{border-color:var(--red);background:rgba(139,26,26,0.05);}
+  .btn-success{background:var(--sage);color:white;border-color:var(--sage);}
+  .btn-danger{background:var(--red-deep);color:white;border-color:var(--red-deep);}
+  .btn-srs{background:rgba(201,168,76,0.15);color:var(--red);border-color:var(--gold);}
+  .srs-mode-bar{background:rgba(139,26,26,0.08);border:1px solid rgba(139,26,26,0.2);border-radius:3px;padding:0.5rem 1rem;margin-bottom:1rem;display:flex;align-items:center;justify-content:space-between;font-size:0.75rem;color:var(--red);}
+  .srs-hint{text-align:center;font-size:0.7rem;color:var(--text-light);margin-top:0.5rem;font-style:italic;}
+  /* VERBS */
+  .verb-selector{display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1.2rem;}
+  .verb-chip{font-family:'Jost',sans-serif;font-size:0.72rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.35rem 0.85rem;border:1px solid var(--border);border-radius:20px;background:transparent;color:var(--text-light);cursor:pointer;transition:all 0.2s;}
+  .verb-chip.active,.verb-chip:hover{background:var(--red);color:var(--gold-light);border-color:var(--red);}
+  .verb-card{border:1px solid var(--border);background:var(--ivory);border-radius:3px;overflow:hidden;margin-bottom:1rem;}
+  .verb-header{background:var(--red);padding:1rem 1.5rem;display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:0.5rem;}
+  .verb-title{font-family:'Playfair Display',serif;font-size:1.5rem;color:var(--gold-light);}
+  .verb-meaning{font-family:'Cormorant Garamond',serif;font-style:italic;color:rgba(255,255,255,0.6);font-size:1rem;}
+  .verb-type{font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);background:rgba(201,168,76,0.15);padding:0.2rem 0.6rem;border-radius:10px;border:1px solid rgba(201,168,76,0.3);}
+  .verb-tip{padding:0.6rem 1.5rem;background:rgba(201,168,76,0.08);border-bottom:1px solid var(--border);font-size:0.78rem;color:var(--text-light);font-style:italic;line-height:1.4;}
+  .tense-tabs{display:flex;border-bottom:1px solid var(--border);}
+  .tense-tab{flex:1;padding:0.6rem;text-align:center;font-family:'Jost',sans-serif;font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;border:none;background:transparent;color:var(--text-light);transition:all 0.2s;border-right:1px solid var(--border);}
+  .tense-tab:last-child{border-right:none;}
+  .tense-tab.active{background:rgba(201,168,76,0.1);color:var(--red);font-weight:600;}
+  .tense-tab:hover:not(.active){background:rgba(139,26,26,0.04);}
+  .tense-label{font-size:0.6rem;display:block;opacity:0.6;margin-top:0.1rem;}
+  .tense-panel{display:none;}
+  .conj-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;}
+  .conj-cell{padding:0.65rem 1.2rem;border-bottom:1px solid var(--border);border-right:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:0.5rem;}
+  .conj-cell:nth-child(even){border-right:none;}
+  .conj-cell:nth-last-child(-n+2){border-bottom:none;}
+  .conj-pronoun{font-size:0.7rem;color:var(--text-light);letter-spacing:0.05em;min-width:55px;}
+  .conj-form{font-family:'Playfair Display',serif;font-size:1rem;color:var(--red);}
+  .conj-audio{background:none;border:none;cursor:pointer;color:var(--gold);font-size:0.85rem;padding:0.1rem 0.3rem;opacity:0.7;transition:opacity 0.2s;}
+  .conj-audio:hover{opacity:1;}
+  .tense-note{padding:0.6rem 1.2rem;background:rgba(139,26,26,0.03);border-top:1px solid var(--border);font-size:0.75rem;color:var(--text-light);font-style:italic;line-height:1.4;}
+  .verb-example{padding:0.8rem 1.5rem;background:rgba(139,26,26,0.03);border-top:1px solid var(--border);}
+  .verb-example-es{font-family:'Playfair Display',serif;font-size:0.92rem;color:var(--red);margin-bottom:0.2rem;}
+  .verb-example-en{font-family:'Cormorant Garamond',serif;font-style:italic;color:var(--text-light);font-size:0.85rem;}
+  /* LISTEN */
+  .listen-score-bar{display:flex;justify-content:center;gap:2rem;padding:1rem;border:1px solid var(--border);background:var(--ivory);border-radius:3px;margin-bottom:1.5rem;}
+  .listen-card{border:1px solid var(--border);background:var(--ivory);border-radius:3px;padding:2rem 1.5rem;margin-bottom:1.5rem;text-align:center;}
+  .listen-round-label{font-size:0.7rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);margin-bottom:1rem;}
+  .listen-play-btn{width:90px;height:90px;border-radius:50%;background:var(--red);border:3px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:2rem;cursor:pointer;margin:0 auto 1.2rem;transition:all 0.2s;color:var(--gold-light);}
+  .listen-play-btn:hover{background:var(--red-deep);transform:scale(1.05);}
+  .listen-play-btn.playing{background:var(--red-deep);animation:pulse 1s infinite;}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(139,26,26,0.4);}50%{box-shadow:0 0 0 12px rgba(139,26,26,0);}}
+  .listen-instruction{font-family:'Cormorant Garamond',serif;font-style:italic;color:var(--text-light);font-size:0.95rem;margin-bottom:0.5rem;}
+  .listen-replay{font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);background:none;border:1px solid var(--border);border-radius:2px;padding:0.3rem 0.8rem;cursor:pointer;margin-top:0.5rem;}
+  .listen-replay:hover{border-color:var(--gold);background:rgba(201,168,76,0.08);}
+  .listen-word-reveal{font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--red);margin-top:0.5rem;display:none;}
+  .listen-options{display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;margin-bottom:1.2rem;}
+  .listen-option{padding:0.9rem;border:1px solid var(--border);background:var(--ivory);border-radius:3px;font-family:'Playfair Display',serif;font-size:1.05rem;color:var(--red);cursor:pointer;transition:all 0.2s;text-align:center;}
+  .listen-option:hover:not(:disabled){border-color:var(--red);background:rgba(139,26,26,0.04);}
+  .listen-option.correct{background:rgba(107,127,90,0.15);border-color:var(--sage);color:var(--sage);}
+  .listen-option.wrong{background:rgba(139,26,26,0.1);border-color:var(--red-deep);color:var(--red-deep);}
+  .listen-option:disabled{cursor:default;}
+  .listen-feedback{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.1rem;min-height:1.8rem;margin-bottom:1rem;text-align:center;}
+  .listen-feedback.correct{color:var(--sage);}
+  .listen-feedback.wrong{color:var(--red-deep);}
+  .listen-tip{background:rgba(201,168,76,0.08);border:1px solid var(--border);border-radius:3px;padding:0.8rem 1rem;font-size:0.78rem;color:var(--text-light);margin-bottom:1.2rem;line-height:1.5;}
+  .listen-tip strong{color:var(--red);display:block;margin-bottom:0.2rem;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;}
+  /* SENTENCES */
+  .sentences-grid{display:flex;flex-direction:column;gap:1rem;}
+  .sentence-card{border:1px solid var(--border);background:var(--ivory);border-radius:3px;padding:1.1rem 1.3rem;display:flex;align-items:flex-start;gap:1rem;transition:box-shadow 0.2s;}
+  .sentence-card:hover{box-shadow:0 4px 20px rgba(139,26,26,0.08);}
+  .sentence-icon{font-size:1.2rem;flex-shrink:0;margin-top:0.1rem;}
+  .sentence-content{flex:1;}
+  .sentence-es{font-family:'Playfair Display',serif;font-size:1rem;color:var(--red);margin-bottom:0.3rem;}
+  .sentence-en{font-family:'Cormorant Garamond',serif;font-style:italic;color:var(--text-light);font-size:0.9rem;}
+  .sentence-situation{font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);margin-bottom:0.3rem;}
+  .sentence-audio{background:none;border:1px solid var(--border);border-radius:50%;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--gold);flex-shrink:0;transition:all 0.2s;font-size:0.85rem;}
+  .sentence-audio:hover{background:rgba(201,168,76,0.15);}
+  .sentences-filter{display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1.2rem;}
+  .filter-chip{font-family:'Jost',sans-serif;font-size:0.7rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.3rem 0.8rem;border:1px solid var(--border);border-radius:20px;background:transparent;color:var(--text-light);cursor:pointer;transition:all 0.2s;}
+  .filter-chip.active,.filter-chip:hover{background:var(--red);color:var(--gold-light);border-color:var(--red);}
+  /* QUIZ */
+  .quiz-question{border:1px solid var(--border);background:var(--ivory);border-radius:3px;padding:1.6rem;margin-bottom:1.2rem;text-align:center;}
+  .quiz-q-label{font-size:0.7rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);margin-bottom:0.8rem;}
+  .quiz-q-word{font-family:'Playfair Display',serif;font-size:clamp(1.5rem,4vw,2.2rem);color:var(--red);margin-bottom:0.3rem;}
+  .quiz-q-type{font-family:'Cormorant Garamond',serif;font-style:italic;color:var(--text-light);font-size:0.9rem;}
+  .quiz-options{display:grid;grid-template-columns:1fr 1fr;gap:0.7rem;margin-bottom:1.2rem;}
+  .quiz-option{padding:0.8rem;border:1px solid var(--border);background:var(--ivory);border-radius:3px;font-family:'Cormorant Garamond',serif;font-size:1rem;color:var(--red);cursor:pointer;transition:all 0.2s;text-align:center;}
+  .quiz-option:hover:not(:disabled){border-color:var(--red);background:rgba(139,26,26,0.04);}
+  .quiz-option.correct{background:rgba(107,127,90,0.15);border-color:var(--sage);color:var(--sage);}
+  .quiz-option.wrong{background:rgba(139,26,26,0.1);border-color:var(--red-deep);color:var(--red-deep);}
+  .quiz-option:disabled{cursor:default;}
+  .quiz-feedback{text-align:center;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.05rem;min-height:1.5rem;margin-bottom:1rem;}
+  .quiz-feedback.correct{color:var(--sage);}.quiz-feedback.wrong{color:var(--red-deep);}
+  .quiz-score-display{display:flex;justify-content:center;gap:2rem;padding:1rem;border:1px solid var(--border);background:var(--ivory);border-radius:3px;margin-bottom:1.2rem;}
+  /* PROGRESS */
+  .progress-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:0.7rem;margin-bottom:1.2rem;}
+  .progress-card{border:1px solid var(--border);background:var(--ivory);border-radius:3px;padding:0.9rem;text-align:center;}
+  .progress-card-icon{font-size:1.3rem;margin-bottom:0.3rem;}
+  .progress-card-num{font-family:'Playfair Display',serif;font-size:1.5rem;color:var(--red);display:block;}
+  .progress-card-label{font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-light);}
+  .word-mastery-list{border:1px solid var(--border);border-radius:3px;overflow:hidden;max-height:350px;overflow-y:auto;}
+  .word-mastery-header{background:var(--red);color:var(--gold-light);padding:0.7rem 1.2rem;font-size:0.68rem;letter-spacing:0.15em;text-transform:uppercase;display:grid;grid-template-columns:1fr 1fr auto auto;gap:0.5rem;position:sticky;top:0;}
+  .word-mastery-item{display:grid;grid-template-columns:1fr 1fr auto auto;gap:0.5rem;padding:0.55rem 1.2rem;border-bottom:1px solid var(--border);align-items:center;background:var(--ivory);font-size:0.82rem;}
+  .word-mastery-item:last-child{border-bottom:none;}
+  .mastery-dot{width:9px;height:9px;border-radius:50%;display:inline-block;}
+  .mastery-0{background:#ddd;}.mastery-1{background:var(--gold);}.mastery-2{background:var(--sage);}
+  .next-review{font-size:0.65rem;color:var(--text-light);white-space:nowrap;}
+  .next-review.due{color:var(--red-deep);font-weight:500;}
+  .section-title{font-family:'Playfair Display',serif;font-size:1rem;color:var(--red);margin-bottom:1rem;padding-bottom:0.5rem;border-bottom:1px solid var(--border);}
+  .divider{text-align:center;color:var(--gold);font-size:1.2rem;letter-spacing:0.5em;margin:1rem 0;opacity:0.4;}
+  .reset-btn{font-size:0.7rem;color:var(--red-deep);background:none;border:none;cursor:pointer;text-decoration:underline;}
+  .streak-history{display:flex;gap:0.3rem;flex-wrap:wrap;margin-top:0.5rem;}
+  .streak-day{width:20px;height:20px;border-radius:3px;background:#e8e0d0;}
+  .streak-day.done{background:var(--gold);}
+  .streak-day.today{border:2px solid var(--red);}
+  /* SENTENCE CARDS */
+  .sentcard-header{border:1px solid var(--border);background:var(--ivory);border-radius:3px;padding:1rem 1.2rem;margin-bottom:1rem;}
+  .sentcard-header-row{display:flex;justify-content:space-between;align-items:flex-start;gap:0.8rem;flex-wrap:wrap;margin-bottom:0.7rem;}
+  .sentcard-title{font-family:'Playfair Display',serif;font-size:1rem;color:var(--red);margin-bottom:0.1rem;}
+  .sentcard-subtitle{font-size:0.72rem;color:var(--text-light);font-style:italic;}
+  .sentcard-controls{display:flex;align-items:center;justify-content:space-between;}
+  .sentcard-sentence{font-family:'Playfair Display',serif;font-size:clamp(1.1rem,3.5vw,1.6rem);color:var(--red);text-align:center;line-height:1.4;margin-bottom:0.8rem;max-width:320px;}
+  .sentcard-blank{display:inline-block;min-width:80px;border-bottom:3px solid var(--gold);color:transparent;background:rgba(201,168,76,0.15);border-radius:2px;padding:0 4px;user-select:none;}
+  .sentcard-prompt{font-family:'Cormorant Garamond',serif;font-style:italic;color:var(--text-light);font-size:0.9rem;margin-bottom:0.3rem;}
+  .sentcard-answer-word{font-family:'Playfair Display',serif;font-size:clamp(1.6rem,4vw,2.4rem);color:var(--gold-light);margin-bottom:0.5rem;text-align:center;}
+  .sentcard-sentence-full{font-family:'Playfair Display',serif;font-size:1rem;color:rgba(255,255,255,0.9);text-align:center;margin-bottom:0.4rem;line-height:1.4;max-width:300px;}
+  .sentcard-translation{font-family:'Cormorant Garamond',serif;font-style:italic;color:rgba(255,255,255,0.55);font-size:0.9rem;text-align:center;max-width:300px;}
+  /* DAILY */
+  .daily-header{background:var(--red);border-radius:3px;padding:1.2rem 1.4rem;margin-bottom:1.2rem;}
+  .daily-title-row{display:flex;align-items:center;gap:1rem;}
+  .daily-icon{font-size:1.8rem;flex-shrink:0;}
+  .daily-title{font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--gold-light);margin-bottom:0.1rem;}
+  .daily-subtitle{font-size:0.72rem;color:rgba(255,255,255,0.55);letter-spacing:0.05em;}
+  .daily-progress-ring{margin-left:auto;text-align:center;background:rgba(201,168,76,0.15);border:2px solid var(--gold);border-radius:50%;width:52px;height:52px;display:flex;align-items:center;justify-content:center;flex-direction:column;flex-shrink:0;}
+  #dailyRingNum{font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--gold-light);line-height:1;}
+  .daily-ring-of{font-size:0.6rem;color:rgba(255,255,255,0.5);}
+  .daily-card{border:1px solid var(--border);background:var(--ivory);border-radius:3px;padding:1.8rem 1.5rem;text-align:center;margin-bottom:1.2rem;box-shadow:0 4px 20px rgba(139,26,26,0.08);}
+  .daily-sel-label{font-size:0.68rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);margin-bottom:0.7rem;}
+  .daily-sel-category{font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-light);margin-bottom:0.5rem;}
+  .daily-sel-word{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,5vw,2.8rem);color:var(--red);margin-bottom:0.3rem;line-height:1.1;}
+  .daily-sel-ipa{font-family:'Cormorant Garamond',serif;font-style:italic;color:var(--text-light);font-size:1rem;margin-bottom:0.8rem;}
+  .daily-audio-btn{background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.4);border-radius:20px;padding:0.35rem 1rem;font-family:'Jost',sans-serif;font-size:0.75rem;color:var(--gold);cursor:pointer;margin-bottom:1rem;transition:all 0.2s;}
+  .daily-audio-btn:hover{background:rgba(201,168,76,0.25);}
+  .daily-sel-example{font-family:'Playfair Display',serif;font-size:0.95rem;color:var(--red);margin-bottom:0.2rem;}
+  .daily-sel-exampleEn{font-family:'Cormorant Garamond',serif;font-style:italic;color:var(--text-light);font-size:0.88rem;}
+  .daily-sel-buttons{display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;margin-bottom:0.8rem;}
+  .daily-btn-know{background:rgba(107,127,90,0.12);color:var(--sage);border:1px solid var(--sage);font-size:0.8rem;padding:0.75rem;}
+  .daily-btn-know:hover{background:rgba(107,127,90,0.22);}
+  .daily-btn-learn{background:var(--red);color:var(--gold-light);border:1px solid var(--red);font-size:0.8rem;padding:0.75rem;}
+  .daily-btn-learn:hover{background:var(--red-deep);}
+  .daily-sel-hint{text-align:center;font-size:0.72rem;color:var(--text-light);font-style:italic;min-height:1rem;}
+  .daily-study-info{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.8rem;font-family:'Cormorant Garamond',serif;font-style:italic;color:var(--text-light);}
+  .daily-complete{text-align:center;padding:2rem;border:1px solid var(--border);background:var(--ivory);border-radius:3px;margin-top:1rem;}
+  .daily-complete-icon{font-size:2.5rem;margin-bottom:0.5rem;}
+  .daily-complete-title{font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--red);margin-bottom:0.4rem;}
+  .daily-complete-sub{font-family:'Cormorant Garamond',serif;font-style:italic;color:var(--text-light);font-size:0.9rem;}
+  /* ACHIEVEMENTS */
+  .trophy-cabinet{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:0.8rem;margin-bottom:1.5rem;}
+  .trophy{border:1px solid var(--border);background:var(--ivory);border-radius:3px;padding:0.9rem;text-align:center;transition:all 0.3s;}
+  .trophy.earned{border-color:var(--gold);background:linear-gradient(135deg,var(--ivory),rgba(201,168,76,0.08));}
+  .trophy.locked{opacity:0.45;filter:grayscale(0.5);}
+  .trophy-icon{font-size:1.7rem;margin-bottom:0.3rem;display:block;}
+  .trophy-title{font-family:'Playfair Display',serif;font-size:0.8rem;color:var(--red);margin-bottom:0.2rem;}
+  .trophy-desc{font-size:0.63rem;color:var(--text-light);line-height:1.3;}
+  .trophy-earned-label{font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);margin-top:0.3rem;display:block;}
+  /* BACKUP */
+  .backup-bar{background:var(--ivory);border:1px solid var(--border);border-radius:3px;padding:0.9rem 1.2rem;margin-bottom:0.6rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.8rem;}
+  .backup-info{display:flex;align-items:center;gap:0.8rem;}
+  .backup-icon{font-size:1.4rem;}
+  .backup-info strong{display:block;font-size:0.8rem;color:var(--red);margin-bottom:0.1rem;}
+  .backup-info span{font-size:0.72rem;color:var(--text-light);}
+  .backup-buttons{display:flex;gap:0.5rem;flex-wrap:wrap;}
+  /* ACHIEVEMENT POPUP */
+  .achievement-popup{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0.8);background:var(--red);border:2px solid var(--gold);border-radius:6px;padding:2rem;text-align:center;z-index:1000;opacity:0;pointer-events:none;transition:all 0.4s cubic-bezier(0.34,1.56,0.64,1);max-width:280px;width:90%;}
+  .achievement-popup.show{opacity:1;transform:translate(-50%,-50%) scale(1);pointer-events:auto;}
+  .achievement-popup-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:999;opacity:0;pointer-events:none;transition:opacity 0.3s;}
+  .achievement-popup-overlay.show{opacity:1;pointer-events:auto;}
+  .popup-icon{font-size:3rem;display:block;margin-bottom:0.8rem;}
+  .popup-title{font-family:'Playfair Display',serif;font-size:0.8rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);margin-bottom:0.4rem;}
+  .popup-achievement{font-family:'Playfair Display',serif;font-size:1.3rem;color:var(--gold-light);margin-bottom:0.5rem;}
+  .popup-desc{font-family:'Cormorant Garamond',serif;font-style:italic;color:rgba(255,255,255,0.7);font-size:0.95rem;margin-bottom:1rem;}
+  .popup-close{font-family:'Jost',sans-serif;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;padding:0.5rem 1.2rem;background:rgba(201,168,76,0.2);border:1px solid var(--gold);color:var(--gold-light);border-radius:2px;cursor:pointer;}
+  .confetti-piece{position:fixed;width:8px;height:8px;border-radius:2px;pointer-events:none;z-index:1001;animation:confettiFall 2.5s ease-in forwards;}
+  @keyframes confettiFall{0%{transform:translateY(-20px) rotate(0deg);opacity:1;}100%{transform:translateY(100vh) rotate(720deg);opacity:0;}}
+  @media(max-width:500px){.quiz-options,.listen-options{grid-template-columns:1fr;}.stats-row{gap:0.7rem;}.conj-grid{grid-template-columns:1fr;}.conj-cell{border-right:none;}.tense-tab .tense-label{display:none;}.daily-sel-buttons{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="achievement-popup-overlay" id="popupOverlay" onclick="closePopup()"></div>
+<div class="achievement-popup" id="achievementPopup">
+  <span class="popup-icon" id="popupIcon">🏆</span>
+  <div class="popup-title">Achievement Unlocked!</div>
+  <div class="popup-achievement" id="popupName"></div>
+  <div class="popup-desc" id="popupDesc"></div>
+  <button class="popup-close" onclick="closePopup()">¡Excelente!</button>
+</div>
+<header>
+  <div class="header-ornament">✦ &nbsp; Language for Life &nbsp; ✦</div>
+  <h1>¿Hablas <em>Español</em>?</h1>
+  <p class="subtitle">Linguavita — Language for Life</p>
+  <div class="save-indicator" id="saveIndicator">✓ Progreso guardado — Linguavita</div>
+</header>
+<div class="progress-section">
+  <div class="progress-label"><span>Vocabulary Mastered</span><span id="progressPct">0%</span></div>
+  <div class="progress-bar-outer"><div class="progress-bar-inner" id="progressBar" style="width:0%"></div></div>
+  <div class="stats-row">
+    <div class="stat"><span class="stat-num" id="statMastered">0</span><span class="stat-label">Mastered</span></div>
+    <div class="stat"><span class="stat-num" id="statLearning">0</span><span class="stat-label">Learning</span></div>
+    <div class="stat"><span class="stat-num" id="statDue">0</span><span class="stat-label">Due Today</span></div>
+    <div class="stat"><span class="stat-num" id="statQuizScore">0%</span><span class="stat-label">Quiz</span></div>
+    <div class="stat"><span class="stat-num" id="statListenScore">0%</span><span class="stat-label">Listen</span></div>
+  </div>
+  <div style="text-align:center;">
+    <div class="streak-badge" id="streakBadge">🔥 <span id="streakCount">0</span> day streak</div>
+  </div>
+  <div class="streak-today" id="streakToday"></div>
+</div>
+<nav>
+  <button class="tab-btn" onclick="showTab('daily',this)">⭐ Daily</button>
+  <button class="tab-btn active" onclick="showTab('flashcards',this)">Cards</button>
+  <button class="tab-btn" onclick="showTab('sentcards',this)">Sentences</button>
+  <button class="tab-btn" onclick="showTab('listen',this)">🎧 Listen</button>
+  <button class="tab-btn" onclick="showTab('verbs',this)">Verbs</button>
+  <button class="tab-btn" onclick="showTab('quiz',this)">Quiz</button>
+  <button class="tab-btn" onclick="showTab('progress',this)">Progress</button>
+</nav>
+<main>
+  <!-- DAILY 10 -->
+  <div class="panel" id="panel-daily">
+    <div class="daily-header">
+      <div class="daily-title-row">
+        <span class="daily-icon">⭐</span>
+        <div><h2 class="daily-title">Your Daily 10</h2><p class="daily-subtitle" id="dailySubtitle">10 words selected for today</p></div>
+        <div class="daily-progress-ring"><span id="dailyRingNum">0</span><span class="daily-ring-of">/10</span></div>
+      </div>
+    </div>
+    <div id="dailySelectPhase">
+      <div class="daily-card">
+        <div class="daily-sel-label" id="dailySelLabel">Word 1 of 10</div>
+        <div class="daily-sel-category" id="dailySelCategory"></div>
+        <div class="daily-sel-word" id="dailySelWord"></div>
+        <div class="daily-sel-ipa" id="dailySelIpa"></div>
+        <button class="daily-audio-btn" onclick="speakDailyWord()">🔊 Hear it</button>
+        <div class="daily-sel-example" id="dailySelExample"></div>
+        <div class="daily-sel-exampleEn" id="dailySelExampleEn"></div>
+      </div>
+      <div class="daily-sel-buttons">
+        <button class="btn daily-btn-know" onclick="dailyKnowIt()">I already know this ✓</button>
+        <button class="btn daily-btn-learn" onclick="dailyLearnIt()">Learn this today 📖</button>
+      </div>
+      <p class="daily-sel-hint" id="dailySelHint"></p>
+    </div>
+    <div id="dailyStudyPhase" style="display:none;">
+      <div class="daily-study-info">
+        <span id="dailyStudyCounter">Card 1 of 10</span>
+        <button class="btn btn-outline" style="font-size:0.65rem;padding:0.3rem 0.7rem;" onclick="resetDailyStudy()">↺ Restart</button>
+      </div>
+      <div class="flashcard-scene" onclick="flipDailyCard()">
+        <div class="flashcard" id="dailyFlashcard">
+          <div class="fc-face fc-front">
+            <span class="fc-hint">tap to reveal</span>
+            <div class="fc-category" id="dailyFcCategory"></div>
+            <div class="fc-word" id="dailyFcWord"></div>
+            <div class="fc-pronunciation" id="dailyFcIpa"></div>
+            <button class="audio-btn" onclick="event.stopPropagation();speakDailyStudyWord()">🔊</button>
+          </div>
+          <div class="fc-face fc-back">
+            <span class="fc-hint">tap to flip back</span>
+            <div class="fc-category" style="color:var(--gold);" id="dailyFcCategoryBack"></div>
+            <div class="fc-word" id="dailyFcEnglish"></div>
+            <div class="fc-pronunciation" id="dailyFcIpaBack"></div>
+            <div class="fc-translation" id="dailyFcExample"></div>
+            <div class="fc-example" id="dailyFcExampleEn"></div>
+            <div class="fc-grammar-tip" id="dailyFcTip" style="display:none;"><strong>💡 Grammar Tip</strong><span id="dailyFcTipText"></span></div>
+            <button class="audio-btn" onclick="event.stopPropagation();speakDailyStudyWord()" style="margin-top:0.6rem;">🔊</button>
+          </div>
+        </div>
+      </div>
+      <div class="fc-nav">
+        <button class="btn btn-outline" onclick="prevDailyCard()">← Prev</button>
+        <button class="btn btn-danger" onclick="markDailyCard(0)">Again</button>
+        <button class="btn btn-outline" onclick="markDailyCard(1)">Hard</button>
+        <button class="btn btn-success" onclick="markDailyCard(2)">Good ✓</button>
+        <button class="btn btn-primary" onclick="markDailyCard(3)">Easy ⭐</button>
+        <button class="btn btn-outline" onclick="nextDailyCard()">Next →</button>
+      </div>
+      <p class="srs-hint">Again = today · Hard = 1 day · Good = 3 days · Easy = 7 days</p>
+      <div class="daily-complete" id="dailyComplete" style="display:none;">
+        <div class="daily-complete-icon">🎉</div>
+        <h3 class="daily-complete-title">Daily 10 complete!</h3>
+        <p class="daily-complete-sub">Come back tomorrow for 10 more words.</p>
+        <button class="btn btn-primary" onclick="resetDailyStudy()" style="margin-top:1rem;">↺ Study again</button>
+      </div>
+    </div>
+  </div>
+  <!-- FLASHCARDS -->
+  <div class="panel active" id="panel-flashcards">
+    <div id="srsModeBar" class="srs-mode-bar" style="display:none;">
+      🔁 Review Mode — <span id="srsDueCount">0</span> cards due
+      <button class="btn btn-outline" style="font-size:0.65rem;padding:0.25rem 0.6rem;" onclick="exitSrsMode()">Exit</button>
+    </div>
+    <div class="flashcard-controls">
+      <select class="category-select" id="categorySelect" onchange="filterCategory()">
+        <option value="all">All Categories</option>
+        <option value="Essentials">Essentials</option>
+        <option value="Numbers">Numbers</option>
+        <option value="Time">Time</option>
+        <option value="People">People</option>
+        <option value="Places">Places</option>
+        <option value="Food">Food &amp; Drink</option>
+        <option value="Actions">Actions</option>
+        <option value="Descriptions">Descriptions</option>
+        <option value="Travel">Travel</option>
+        <option value="Health">Health</option>
+        <option value="Weather">Weather</option>
+        <option value="Home">Home &amp; Daily Life</option>
+        <option value="Emotions">Emotions</option>
+        <option value="Shopping">Shopping</option>
+        <option value="Nature">Nature</option>
+      </select>
+      <span class="fc-counter" id="fcCounter">Card 1 of 400</span>
+      <button class="btn btn-srs" onclick="startSrsMode()">Review Due</button>
+      <button class="btn btn-outline" onclick="shuffleCards()">Shuffle</button>
+    </div>
+    <div class="flashcard-scene" onclick="flipCard()">
+      <div class="flashcard" id="flashcard">
+        <div class="fc-face fc-front">
+          <span class="fc-hint">tap to reveal</span>
+          <div class="fc-srs-info" id="fcSrsInfo"></div>
+          <div class="fc-category" id="fcCategory">Essentials</div>
+          <div class="fc-word" id="fcSpanish">hola</div>
+          <div class="fc-pronunciation" id="fcPronunciation">/ˈo.la/</div>
+          <button class="audio-btn" onclick="event.stopPropagation();speakWord()">🔊</button>
+        </div>
+        <div class="fc-face fc-back">
+          <span class="fc-hint">tap to flip back</span>
+          <div class="fc-category" style="color:var(--gold);" id="fcCategoryBack">Essentials</div>
+          <div class="fc-word" id="fcEnglish">hello</div>
+          <div class="fc-pronunciation" id="fcPronunciationBack">/ˈo.la/</div>
+          <div class="fc-translation" id="fcExample">¡Hola, ¿cómo estás?</div>
+          <div class="fc-example" id="fcExampleEn">Hello, how are you?</div>
+          <div class="fc-grammar-tip" id="fcGrammarTip" style="display:none;"><strong>💡 Grammar Tip</strong><span id="fcGrammarText"></span></div>
+          <button class="audio-btn" onclick="event.stopPropagation();speakWord()" style="margin-top:0.6rem;">🔊</button>
+        </div>
+      </div>
+    </div>
+    <div class="fc-nav">
+      <button class="btn btn-outline" onclick="prevCard()">← Prev</button>
+      <button class="btn btn-danger" onclick="markCard(0)">Again</button>
+      <button class="btn btn-outline" onclick="markCard(1)">Hard</button>
+      <button class="btn btn-success" onclick="markCard(2)">Good ✓</button>
+      <button class="btn btn-primary" onclick="markCard(3)">Easy ⭐</button>
+      <button class="btn btn-outline" onclick="nextCard()">Next →</button>
+    </div>
+    <p class="srs-hint">Again = today · Hard = 1 day · Good = 3 days · Easy = 7 days</p>
+  </div>
+  <!-- SENTENCE CARDS -->
+  <div class="panel" id="panel-sentcards">
+    <div class="sentcard-header">
+      <div class="sentcard-header-row">
+        <div><h2 class="sentcard-title">Sentence Flashcards</h2><p class="sentcard-subtitle">Fill in the missing word — tap to reveal</p></div>
+        <select class="category-select" id="sentCardCatSelect" onchange="filterSentCards()" style="align-self:center;">
+          <option value="all">All Categories</option>
+          <option value="Essentials">Essentials</option>
+          <option value="Numbers">Numbers</option>
+          <option value="Time">Time</option>
+          <option value="People">People</option>
+          <option value="Places">Places</option>
+          <option value="Food">Food &amp; Drink</option>
+          <option value="Actions">Actions</option>
+          <option value="Descriptions">Descriptions</option>
+          <option value="Travel">Travel</option>
+          <option value="Health">Health</option>
+          <option value="Weather">Weather</option>
+          <option value="Home">Home &amp; Daily Life</option>
+          <option value="Emotions">Emotions</option>
+          <option value="Shopping">Shopping</option>
+          <option value="Nature">Nature</option>
+        </select>
+      </div>
+      <div class="sentcard-controls">
+        <span class="fc-counter" id="sentCardCounter">Card 1 of 400</span>
+        <button class="btn btn-outline" onclick="shuffleSentCards()" style="font-size:0.68rem;">Shuffle</button>
+      </div>
+    </div>
+    <div class="flashcard-scene" onclick="flipSentCard()">
+      <div class="flashcard" id="sentFlashcard">
+        <div class="fc-face fc-front">
+          <span class="fc-hint">tap to reveal</span>
+          <div class="fc-category" id="sentFcCategory"></div>
+          <div class="sentcard-sentence" id="sentFcSentence"></div>
+          <div class="sentcard-prompt">What is the missing word?</div>
+          <button class="audio-btn" onclick="event.stopPropagation();speakSentCardBlank()">🔊</button>
+        </div>
+        <div class="fc-face fc-back">
+          <span class="fc-hint">tap to flip back</span>
+          <div class="fc-category" style="color:var(--gold);" id="sentFcCategoryBack"></div>
+          <div class="sentcard-answer-word" id="sentFcWord"></div>
+          <div class="sentcard-sentence-full" id="sentFcSentenceFull"></div>
+          <div class="sentcard-translation" id="sentFcTranslation"></div>
+          <div class="fc-grammar-tip" id="sentFcTip" style="display:none;"><strong>💡 Grammar Tip</strong><span id="sentFcTipText"></span></div>
+          <button class="audio-btn" onclick="event.stopPropagation();speakSentCardFull()" style="margin-top:0.6rem;">🔊</button>
+        </div>
+      </div>
+    </div>
+    <div class="fc-nav">
+      <button class="btn btn-outline" onclick="prevSentCard()">← Prev</button>
+      <button class="btn btn-danger" onclick="markSentCard(0)">Again</button>
+      <button class="btn btn-outline" onclick="markSentCard(1)">Hard</button>
+      <button class="btn btn-success" onclick="markSentCard(2)">Good ✓</button>
+      <button class="btn btn-primary" onclick="markSentCard(3)">Easy ⭐</button>
+      <button class="btn btn-outline" onclick="nextSentCard()">Next →</button>
+    </div>
+    <p class="srs-hint">Again = today · Hard = 1 day · Good = 3 days · Easy = 7 days</p>
+  </div>
+  <!-- LISTEN -->
+  <div class="panel" id="panel-listen">
+    <div class="listen-score-bar">
+      <div class="stat"><span class="stat-num" id="lCorrect">0</span><span class="stat-label">Correct</span></div>
+      <div class="stat"><span class="stat-num" id="lWrong">0</span><span class="stat-label">Wrong</span></div>
+      <div class="stat"><span class="stat-num" id="lStreak">0</span><span class="stat-label">Streak</span></div>
+    </div>
+    <div class="listen-tip">
+      <strong>🎧 How to use Listen Mode</strong>
+      Press the play button to hear a Spanish word spoken aloud, then choose the correct English meaning from the four options below.
+    </div>
+    <div class="listen-card">
+      <div class="listen-round-label" id="listenRoundLabel">Round 1</div>
+      <button class="listen-play-btn" id="listenPlayBtn" onclick="playListenWord()">▶</button>
+      <div class="listen-instruction">Tap ▶ to hear the word</div>
+      <button class="listen-replay" onclick="playListenWord()">↺ Play again</button>
+      <div class="listen-word-reveal" id="listenWordReveal"></div>
+    </div>
+    <div class="listen-options" id="listenOptions"></div>
+    <div class="listen-feedback" id="listenFeedback"></div>
+    <div style="text-align:center;display:flex;gap:0.8rem;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-primary" id="nextListenBtn" onclick="loadListenQuestion()" style="display:none;">Next Word →</button>
+      <button class="btn btn-outline" onclick="resetListen()">Reset</button>
+    </div>
+  </div>
+  <!-- VERBS -->
+  <div class="panel" id="panel-verbs">
+    <div class="verb-selector" id="verbSelector"></div>
+    <div id="verbDisplay"></div>
+  </div>
+  <!-- SENTENCES/PHRASES -->
+  <div class="panel" id="panel-sentences">
+    <div class="sentences-filter">
+      <button class="filter-chip active" onclick="filterSentences('all',this)">All</button>
+      <button class="filter-chip" onclick="filterSentences('Greetings',this)">Greetings</button>
+      <button class="filter-chip" onclick="filterSentences('Dining',this)">Dining</button>
+      <button class="filter-chip" onclick="filterSentences('Shopping',this)">Shopping</button>
+      <button class="filter-chip" onclick="filterSentences('Directions',this)">Directions</button>
+      <button class="filter-chip" onclick="filterSentences('Emergencies',this)">Help</button>
+      <button class="filter-chip" onclick="filterSentences('Social',this)">Social</button>
+      <button class="filter-chip" onclick="filterSentences('Travel',this)">Travel</button>
+      <button class="filter-chip" onclick="filterSentences('Health',this)">Health</button>
+    </div>
+    <div class="sentences-grid" id="sentencesGrid"></div>
+  </div>
+  <!-- QUIZ -->
+  <div class="panel" id="panel-quiz">
+    <div class="quiz-score-display">
+      <div class="stat"><span class="stat-num" id="qCorrect">0</span><span class="stat-label">Correct</span></div>
+      <div class="stat"><span class="stat-num" id="qWrong">0</span><span class="stat-label">Wrong</span></div>
+      <div class="stat"><span class="stat-num" id="qTotal">0</span><span class="stat-label">Answered</span></div>
+    </div>
+    <div class="quiz-question">
+      <div class="quiz-q-label" id="quizLabel">What does this mean in English?</div>
+      <div class="quiz-q-word" id="quizWord">—</div>
+      <div class="quiz-q-type" id="quizType"></div>
+    </div>
+    <div class="quiz-options" id="quizOptions"></div>
+    <div class="quiz-feedback" id="quizFeedback"></div>
+    <div style="text-align:center;display:flex;gap:0.8rem;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-primary" id="nextQuizBtn" onclick="loadQuizQuestion()" style="display:none;">Next Question →</button>
+      <button class="btn btn-outline" onclick="resetQuiz()">Reset Quiz</button>
+    </div>
+  </div>
+  <!-- PROGRESS -->
+  <div class="panel" id="panel-progress">
+    <div class="progress-cards">
+      <div class="progress-card"><div class="progress-card-icon">⭐</div><span class="progress-card-num" id="pMastered">0</span><span class="progress-card-label">Mastered</span></div>
+      <div class="progress-card"><div class="progress-card-icon">📖</div><span class="progress-card-num" id="pLearning">0</span><span class="progress-card-label">Learning</span></div>
+      <div class="progress-card"><div class="progress-card-icon">🔁</div><span class="progress-card-num" id="pDue">0</span><span class="progress-card-label">Due Today</span></div>
+      <div class="progress-card"><div class="progress-card-icon">🎯</div><span class="progress-card-num" id="pAccuracy">—</span><span class="progress-card-label">Quiz %</span></div>
+      <div class="progress-card"><div class="progress-card-icon">🎧</div><span class="progress-card-num" id="pListenAcc">—</span><span class="progress-card-label">Listen %</span></div>
+      <div class="progress-card"><div class="progress-card-icon">🔥</div><span class="progress-card-num" id="pStreak">0</span><span class="progress-card-label">Streak</span></div>
+    </div>
+    <div style="text-align:center;margin-bottom:0.5rem;">
+      <p style="font-size:0.75rem;color:var(--text-light);margin-bottom:0.5rem;">Last 14 days</p>
+      <div class="streak-history" id="streakHistory" style="justify-content:center;"></div>
+    </div>
+    <div class="divider">· · · ✦ · · ·</div>
+    <h3 class="section-title">🏆 Trophy Cabinet</h3>
+    <div class="trophy-cabinet" id="trophyCabinet"></div>
+    <div class="divider">· · · ✦ · · ·</div>
+    <h3 class="section-title">Word Progress</h3>
+    <div style="text-align:right;margin-bottom:0.6rem;"><button class="reset-btn" onclick="confirmReset()">Reset all progress</button></div>
+    <div class="backup-bar">
+      <div class="backup-info">
+        <span class="backup-icon">💾</span>
+        <div><strong>Back up your progress</strong><span>Download a save file or restore from a previous backup</span></div>
+      </div>
+      <div class="backup-buttons">
+        <button class="btn btn-outline" onclick="exportProgress()">⬇ Download backup</button>
+        <label class="btn btn-outline" style="cursor:pointer;">⬆ Restore backup<input type="file" accept=".json" onchange="importProgress(event)" style="display:none;"></label>
+      </div>
+    </div>
+    <div id="backupMsg" style="font-size:0.75rem;color:var(--sage);text-align:right;margin-bottom:0.5rem;min-height:1.2rem;"></div>
+    <div class="word-mastery-list">
+      <div class="word-mastery-header"><span>Spanish</span><span>English</span><span>Level</span><span>Next Review</span></div>
+      <div id="masteryList"></div>
+    </div>
+  </div>
+</main>
+<div style="text-align:center;padding:1.5rem;border-top:1px solid rgba(201,168,76,0.2);margin-top:2rem;">
+  <p style="font-family:serif;font-style:italic;font-size:0.75rem;color:#888;letter-spacing:0.1em;">
+    Linguavita — Language for Life &nbsp;·&nbsp;
+    <a href="mailto:contactus@linguavita.app" style="color:inherit;text-decoration:none;">contactus@linguavita.app</a>
+  </p>
+</div>
+<script>
+const words=[
+  // ESSENTIALS (28)
+  {es:'hola',en:'hello',ipa:'/ˈo.la/',cat:'Essentials',ex:'Hola, ¿cómo estás?',exEn:'Hello, how are you?',tip:''},
+  {es:'buenos días',en:'good morning',ipa:'/ˈbwe.nos ˈdi.as/',cat:'Essentials',ex:'Buenos días, ¿cómo te va?',exEn:'Good morning, how are you?',tip:'Literally "good days". Use until about midday.'},
+  {es:'buenas tardes',en:'good afternoon',ipa:'/ˈbwe.nas ˈtar.ðes/',cat:'Essentials',ex:'Buenas tardes a todos.',exEn:'Good afternoon everyone.',tip:'Use from midday until evening.'},
+  {es:'buenas noches',en:'good evening / night',ipa:'/ˈbwe.nas ˈno.tʃes/',cat:'Essentials',ex:'Buenas noches, hasta mañana.',exEn:'Good night, see you tomorrow.',tip:'Used as both a greeting and farewell at night.'},
+  {es:'adiós',en:'goodbye',ipa:'/a.ˈðjos/',cat:'Essentials',ex:'Adiós, hasta pronto.',exEn:'Goodbye, see you soon.',tip:'More formal than "hasta luego".'},
+  {es:'hasta luego',en:'see you later',ipa:'/ˈas.ta ˈlwe.ɣo/',cat:'Essentials',ex:'Hasta luego, amigo.',exEn:'See you later, friend.',tip:'Very commonly used casual farewell.'},
+  {es:'por favor',en:'please',ipa:'/poɾ fa.ˈβoɾ/',cat:'Essentials',ex:'Un café, por favor.',exEn:'A coffee, please.',tip:'Goes at the end of requests, just like in English.'},
+  {es:'gracias',en:'thank you',ipa:'/ˈɡɾa.θjas/',cat:'Essentials',ex:'Muchas gracias por tu ayuda.',exEn:'Thank you very much for your help.',tip:'In Latin America: /ˈɡɾa.sjas/ — the "c" sounds like "s".'},
+  {es:'muchas gracias',en:'thank you very much',ipa:'/ˈmu.tʃas ˈɡɾa.θjas/',cat:'Essentials',ex:'Muchas gracias, muy amable.',exEn:'Thank you very much, very kind.',tip:'"Muy amable" = very kind — a lovely response.'},
+  {es:'de nada',en:"you're welcome",ipa:'/de ˈna.ða/',cat:'Essentials',ex:'De nada, con mucho gusto.',exEn:"You're welcome, with pleasure.",tip:'"Con mucho gusto" = with great pleasure.'},
+  {es:'perdona',en:'excuse me / sorry',ipa:'/peɾ.ˈðo.na/',cat:'Essentials',ex:'Perdona, ¿puedes repetir?',exEn:'Excuse me, can you repeat?',tip:'Casual. More formal: "perdone" or "disculpe".'},
+  {es:'lo siento',en:'I am sorry',ipa:'/lo ˈsjen.to/',cat:'Essentials',ex:'Lo siento mucho.',exEn:'I am very sorry.',tip:'Literally "I feel it". More heartfelt than perdona.'},
+  {es:'sí',en:'yes',ipa:'/si/',cat:'Essentials',ex:'Sí, claro que sí.',exEn:'Yes, of course.',tip:'Always written with an accent to distinguish from "si" (if).'},
+  {es:'no',en:'no',ipa:'/no/',cat:'Essentials',ex:'No, gracias.',exEn:'No, thank you.',tip:''},
+  {es:'quizás',en:'maybe / perhaps',ipa:'/ki.ˈθas/',cat:'Essentials',ex:'Quizás mañana.',exEn:'Maybe tomorrow.',tip:'Also "a lo mejor" or "tal vez".'},
+  {es:'claro',en:'of course / sure',ipa:'/ˈkla.ɾo/',cat:'Essentials',ex:'Claro, con mucho gusto.',exEn:'Of course, with pleasure.',tip:'"Claro que sí" = absolutely yes.'},
+  {es:'cómo',en:'how',ipa:'/ˈko.mo/',cat:'Essentials',ex:'¿Cómo te llamas?',exEn:'What is your name?',tip:'Literally "how do you call yourself".'},
+  {es:'dónde',en:'where',ipa:'/ˈdon.de/',cat:'Essentials',ex:'¿Dónde está el restaurante?',exEn:'Where is the restaurant?',tip:'Always written with an accent in questions.'},
+  {es:'cuándo',en:'when',ipa:'/ˈkwan.do/',cat:'Essentials',ex:'¿Cuándo llegáis?',exEn:'When do you arrive?',tip:''},
+  {es:'por qué',en:'why',ipa:'/poɾ ˈke/',cat:'Essentials',ex:'¿Por qué no?',exEn:'Why not?',tip:'"Por qué" = why (question). "Porque" = because (answer).'},
+  {es:'quién',en:'who',ipa:'/ˈkjen/',cat:'Essentials',ex:'¿Quién es?',exEn:'Who is it?',tip:''},
+  {es:'cuánto',en:'how much / how many',ipa:'/ˈkwan.to/',cat:'Essentials',ex:'¿Cuánto cuesta?',exEn:'How much does it cost?',tip:'"Cuántos años tienes?" = How old are you?'},
+  {es:'con',en:'with',ipa:'/kon/',cat:'Essentials',ex:'Un café con leche.',exEn:'A coffee with milk.',tip:''},
+  {es:'sin',en:'without',ipa:'/sin/',cat:'Essentials',ex:'Un café sin azúcar.',exEn:'A coffee without sugar.',tip:'"Con" and "sin" are opposites.'},
+  {es:'muy',en:'very',ipa:'/muj/',cat:'Essentials',ex:'Muy bien, gracias.',exEn:'Very well, thank you.',tip:'Always comes before the adjective.'},
+  {es:'mucho',en:'a lot / very much',ipa:'/ˈmu.tʃo/',cat:'Essentials',ex:'Me gusta mucho.',exEn:'I like it a lot.',tip:'"Mucho" follows the verb. Agrees with noun: mucho/mucha.'},
+  {es:'también',en:'also / too',ipa:'/tam.ˈbjen/',cat:'Essentials',ex:'¡Yo también!',exEn:'Me too!',tip:''},
+  {es:'vale',en:'OK / alright',ipa:'/ˈba.le/',cat:'Essentials',ex:'Vale, hasta luego.',exEn:'OK, see you later.',tip:'Very Spanish expression — used constantly in Spain!'},
+  // NUMBERS (17)
+  {es:'cero',en:'zero',ipa:'/ˈθe.ɾo/',cat:'Numbers',ex:'Empieza con cero.',exEn:'It starts with zero.',tip:''},
+  {es:'uno / una',en:'one',ipa:'/ˈu.no/',cat:'Numbers',ex:'Tengo un hijo.',exEn:'I have one child.',tip:'"Uno" becomes "un" before masculine nouns.'},
+  {es:'dos',en:'two',ipa:'/dos/',cat:'Numbers',ex:'Dos cafés, por favor.',exEn:'Two coffees, please.',tip:''},
+  {es:'tres',en:'three',ipa:'/tɾes/',cat:'Numbers',ex:'Somos tres.',exEn:'There are three of us.',tip:''},
+  {es:'cuatro',en:'four',ipa:'/ˈkwa.tɾo/',cat:'Numbers',ex:'A las cuatro.',exEn:'At four o\'clock.',tip:''},
+  {es:'cinco',en:'five',ipa:'/ˈθin.ko/',cat:'Numbers',ex:'Cinco minutos.',exEn:'Five minutes.',tip:''},
+  {es:'seis',en:'six',ipa:'/sejs/',cat:'Numbers',ex:'Seis personas.',exEn:'Six people.',tip:''},
+  {es:'siete',en:'seven',ipa:'/ˈsje.te/',cat:'Numbers',ex:'Son las siete.',exEn:'It is seven o\'clock.',tip:''},
+  {es:'ocho',en:'eight',ipa:'/ˈo.tʃo/',cat:'Numbers',ex:'Ocho días.',exEn:'Eight days.',tip:''},
+  {es:'nueve',en:'nine',ipa:'/ˈnwe.βe/',cat:'Numbers',ex:'Nueve euros.',exEn:'Nine euros.',tip:''},
+  {es:'diez',en:'ten',ipa:'/djeθ/',cat:'Numbers',ex:'Diez minutos.',exEn:'Ten minutes.',tip:''},
+  {es:'once',en:'eleven',ipa:'/ˈon.θe/',cat:'Numbers',ex:'Son las once.',exEn:'It is eleven o\'clock.',tip:''},
+  {es:'doce',en:'twelve',ipa:'/ˈdo.θe/',cat:'Numbers',ex:'Doce meses.',exEn:'Twelve months.',tip:''},
+  {es:'veinte',en:'twenty',ipa:'/ˈbejn.te/',cat:'Numbers',ex:'Veinte euros.',exEn:'Twenty euros.',tip:''},
+  {es:'treinta',en:'thirty',ipa:'/ˈtɾejn.ta/',cat:'Numbers',ex:'Tengo treinta años.',exEn:'I am thirty years old.',tip:''},
+  {es:'cien',en:'one hundred',ipa:'/θjen/',cat:'Numbers',ex:'Cien euros.',exEn:'One hundred euros.',tip:'"Cien" = exactly 100. "Ciento..." = 101 and above.'},
+  {es:'mil',en:'one thousand',ipa:'/mil/',cat:'Numbers',ex:'Mil euros.',exEn:'One thousand euros.',tip:'"Mil" never takes an article: "mil" not "un mil".'},
+  // TIME (16)
+  {es:'hoy',en:'today',ipa:'/oj/',cat:'Time',ex:'Hoy hace buen tiempo.',exEn:'Today the weather is nice.',tip:''},
+  {es:'mañana',en:'tomorrow / morning',ipa:'/ma.ˈɲa.na/',cat:'Time',ex:'Hasta mañana.',exEn:'See you tomorrow.',tip:'"Mañana" = tomorrow AND morning. Context tells you which!'},
+  {es:'ayer',en:'yesterday',ipa:'/a.ˈʝeɾ/',cat:'Time',ex:'Ayer fue estupendo.',exEn:'Yesterday was wonderful.',tip:''},
+  {es:'ahora',en:'now',ipa:'/a.ˈo.ɾa/',cat:'Time',ex:'Estoy listo ahora.',exEn:'I am ready now.',tip:'"Ahora mismo" = right now.'},
+  {es:'pronto',en:'soon',ipa:'/ˈpɾon.to/',cat:'Time',ex:'Hasta pronto.',exEn:'See you soon.',tip:''},
+  {es:'siempre',en:'always',ipa:'/ˈsjem.pɾe/',cat:'Time',ex:'Siempre tomo café.',exEn:'I always have coffee.',tip:''},
+  {es:'nunca',en:'never',ipa:'/ˈnuŋ.ka/',cat:'Time',ex:'Nunca fumo.',exEn:'I never smoke.',tip:'"Nunca" can go before or after the verb.'},
+  {es:'a veces',en:'sometimes',ipa:'/a ˈβe.θes/',cat:'Time',ex:'A veces cocino.',exEn:'Sometimes I cook.',tip:''},
+  {es:'mañana',en:'morning',ipa:'/ma.ˈɲa.na/',cat:'Time',ex:'Por la mañana.',exEn:'In the morning.',tip:'"Por la mañana" = in the morning.'},
+  {es:'tarde',en:'afternoon / late',ipa:'/ˈtar.ðe/',cat:'Time',ex:'Por la tarde.',exEn:'In the afternoon.',tip:'"Tarde" = afternoon AND late. Context tells you which!'},
+  {es:'noche',en:'night / evening',ipa:'/ˈno.tʃe/',cat:'Time',ex:'Por la noche.',exEn:'At night.',tip:''},
+  {es:'semana',en:'week',ipa:'/se.ˈma.na/',cat:'Time',ex:'La semana que viene.',exEn:'Next week.',tip:'"La semana que viene" = next week.'},
+  {es:'mes',en:'month',ipa:'/mes/',cat:'Time',ex:'El mes de junio.',exEn:'The month of June.',tip:''},
+  {es:'año',en:'year',ipa:'/ˈa.ɲo/',cat:'Time',ex:'¡Feliz Año Nuevo!',exEn:'Happy New Year!',tip:''},
+  {es:'hora',en:'hour / time',ipa:'/ˈo.ɾa/',cat:'Time',ex:'¿Qué hora es?',exEn:'What time is it?',tip:'"Son las dos" = It is two o\'clock.'},
+  {es:'tiempo',en:'time / weather',ipa:'/ˈtjem.po/',cat:'Time',ex:'No tengo tiempo.',exEn:'I do not have time.',tip:'"Tiempo" means both time and weather!'},
+  // PEOPLE (17)
+  {es:'yo',en:'I',ipa:'/ʝo/',cat:'People',ex:'Yo soy inglés.',exEn:'I am English.',tip:'Subject pronouns are often omitted in Spanish — the verb ending tells you who!'},
+  {es:'tú / usted',en:'you',ipa:'/tu / us.ˈteð/',cat:'People',ex:'¿Tú hablas español?',exEn:'Do you speak Spanish?',tip:'"Tú" = informal. "Usted" = formal (uses 3rd person verb).'},
+  {es:'él / ella',en:'he / she',ipa:'/el / ˈe.ʎa/',cat:'People',ex:'Ella se llama María.',exEn:'Her name is María.',tip:'"Él" has an accent to distinguish from "el" (the).'},
+  {es:'nosotros',en:'we',ipa:'/no.ˈso.tɾos/',cat:'People',ex:'Nosotros amamos España.',exEn:'We love Spain.',tip:'"Nosotras" for an all-female group.'},
+  {es:'ellos / ellas',en:'they',ipa:'/ˈe.ʎos/',cat:'People',ex:'Ellos llegan mañana.',exEn:'They arrive tomorrow.',tip:'"Ellos" mixed/male. "Ellas" all-female.'},
+  {es:'amigo / amiga',en:'friend',ipa:'/a.ˈmi.ɣo/',cat:'People',ex:'Es mi mejor amigo.',exEn:'He is my best friend.',tip:''},
+  {es:'familia',en:'family',ipa:'/fa.ˈmi.lja/',cat:'People',ex:'Mi familia vive en Londres.',exEn:'My family lives in London.',tip:''},
+  {es:'hombre',en:'man',ipa:'/ˈom.bɾe/',cat:'People',ex:'El hombre es alto.',exEn:'The man is tall.',tip:''},
+  {es:'mujer',en:'woman / wife',ipa:'/mu.ˈxeɾ/',cat:'People',ex:'Mi mujer habla español.',exEn:'My wife speaks Spanish.',tip:'Means both woman and wife.'},
+  {es:'niño / niña',en:'child / boy / girl',ipa:'/ˈni.ɲo/',cat:'People',ex:'El niño juega.',exEn:'The child plays.',tip:'"Niño" = boy. "Niña" = girl. "Niños" = children.'},
+  {es:'padre',en:'father',ipa:'/ˈpa.ðɾe/',cat:'People',ex:'Mi padre es médico.',exEn:'My father is a doctor.',tip:'"Padres" = parents!'},
+  {es:'madre',en:'mother',ipa:'/ˈma.ðɾe/',cat:'People',ex:'Mi madre cocina muy bien.',exEn:'My mother cooks very well.',tip:''},
+  {es:'hermano / hermana',en:'brother / sister',ipa:'/eɾ.ˈma.no/',cat:'People',ex:'Mi hermano vive en Madrid.',exEn:'My brother lives in Madrid.',tip:'"Hermanos" = brothers OR siblings.'},
+  {es:'marido',en:'husband',ipa:'/ma.ˈɾi.ðo/',cat:'People',ex:'Mi marido es simpático.',exEn:'My husband is nice.',tip:'Also "esposo".'},
+  {es:'hijo / hija',en:'son / daughter',ipa:'/ˈi.xo/',cat:'People',ex:'Mi hija tiene diez años.',exEn:'My daughter is ten.',tip:'"Hijos" = children / sons.'},
+  {es:'novio / novia',en:'boyfriend / girlfriend',ipa:'/ˈno.βjo/',cat:'People',ex:'Mi novia es española.',exEn:'My girlfriend is Spanish.',tip:'Also means "fiancé" and "groom/bride"!'},
+  {es:'señor / señora',en:'Mr / Mrs',ipa:'/se.ˈɲoɾ/',cat:'People',ex:'Buenos días, señora.',exEn:'Good morning, madam.',tip:'"Señorita" = Miss. Essential for polite address.'},
+  // PLACES (16)
+  {es:'casa',en:'house / home',ipa:'/ˈka.sa/',cat:'Places',ex:'Voy a casa.',exEn:'I am going home.',tip:'"En casa" = at home. "A casa" = homeward.'},
+  {es:'apartamento',en:'apartment / flat',ipa:'/a.paɾ.ta.ˈmen.to/',cat:'Places',ex:'Vivo en un apartamento.',exEn:'I live in an apartment.',tip:'Also "piso" in Spain.'},
+  {es:'calle',en:'street',ipa:'/ˈka.ʎe/',cat:'Places',ex:'En esta calle.',exEn:'On this street.',tip:''},
+  {es:'ciudad',en:'city',ipa:'/θju.ˈðað/',cat:'Places',ex:'Madrid es una ciudad increíble.',exEn:'Madrid is an incredible city.',tip:''},
+  {es:'país',en:'country',ipa:'/pa.ˈis/',cat:'Places',ex:'España es un país bonito.',exEn:'Spain is a beautiful country.',tip:''},
+  {es:'restaurante',en:'restaurant',ipa:'/res.taw.ˈɾan.te/',cat:'Places',ex:'Vamos al restaurante.',exEn:'We are going to the restaurant.',tip:'"Al" = "a + el".'},
+  {es:'panadería',en:'bakery',ipa:'/pa.na.ðe.ˈɾi.a/',cat:'Places',ex:'La panadería abre a las siete.',exEn:'The bakery opens at seven.',tip:''},
+  {es:'hotel',en:'hotel',ipa:'/o.ˈtel/',cat:'Places',ex:'El hotel está cerca de la plaza.',exEn:'The hotel is near the square.',tip:''},
+  {es:'estación',en:'station',ipa:'/es.ta.ˈθjon/',cat:'Places',ex:'La estación de tren.',exEn:'The train station.',tip:'"Estación de metro" = metro station.'},
+  {es:'aeropuerto',en:'airport',ipa:'/a.e.ɾo.ˈpweɾ.to/',cat:'Places',ex:'El aeropuerto está lejos.',exEn:'The airport is far.',tip:''},
+  {es:'mercado',en:'market',ipa:'/meɾ.ˈka.ðo/',cat:'Places',ex:'El mercado de La Boquería.',exEn:'La Boquería market.',tip:'"Supermercado" = supermarket.'},
+  {es:'hospital',en:'hospital',ipa:'/os.pi.ˈtal/',cat:'Places',ex:'El hospital está en el centro.',exEn:'The hospital is in the centre.',tip:''},
+  {es:'farmacia',en:'pharmacy',ipa:'/faɾ.ˈma.θja/',cat:'Places',ex:'La farmacia está abierta.',exEn:'The pharmacy is open.',tip:'Look for the green cross!'},
+  {es:'museo',en:'museum',ipa:'/mu.ˈse.o/',cat:'Places',ex:'El Museo del Prado es increíble.',exEn:'The Prado Museum is incredible.',tip:''},
+  {es:'playa',en:'beach',ipa:'/ˈpla.ʝa/',cat:'Places',ex:'La playa es preciosa en verano.',exEn:'The beach is beautiful in summer.',tip:'Spain has over 8,000km of coastline!'},
+  {es:'tienda',en:'shop / store',ipa:'/ˈtjen.da/',cat:'Places',ex:'La tienda está cerrada.',exEn:'The shop is closed.',tip:''},
+  // FOOD (18)
+  {es:'pan',en:'bread',ipa:'/pan/',cat:'Food',ex:'Una barra de pan, por favor.',exEn:'A bread roll, please.',tip:'"Pan" is the most essential Spanish food word!'},
+  {es:'vino',en:'wine',ipa:'/ˈbi.no/',cat:'Food',ex:'Un vaso de vino tinto.',exEn:'A glass of red wine.',tip:'Red=tinto, white=blanco, rosé=rosado.'},
+  {es:'agua',en:'water',ipa:'/ˈa.ɣwa/',cat:'Food',ex:'Una botella de agua.',exEn:'A bottle of water.',tip:'Sparkling="con gas", still="sin gas".'},
+  {es:'café',en:'coffee',ipa:'/ka.ˈfe/',cat:'Food',ex:'Tomo un café cada mañana.',exEn:'I have a coffee every morning.',tip:'"Café con leche" = half coffee half milk — very popular in Spain.'},
+  {es:'té',en:'tea',ipa:'/te/',cat:'Food',ex:'Un té, por favor.',exEn:'A tea, please.',tip:''},
+  {es:'cerveza',en:'beer',ipa:'/θeɾ.ˈβe.θa/',cat:'Food',ex:'Una cerveza fría.',exEn:'A cold beer.',tip:'"Una caña" = a small draft beer in Spain.'},
+  {es:'jamón',en:'ham',ipa:'/xa.ˈmon/',cat:'Food',ex:'El jamón ibérico es delicioso.',exEn:'Iberian ham is delicious.',tip:'"Jamón ibérico" is a true Spanish treasure!'},
+  {es:'queso',en:'cheese',ipa:'/ˈke.so/',cat:'Food',ex:'Un trozo de queso manchego.',exEn:'A piece of Manchego cheese.',tip:''},
+  {es:'carne',en:'meat',ipa:'/ˈkaɾ.ne/',cat:'Food',ex:'No como carne.',exEn:'I do not eat meat.',tip:''},
+  {es:'pescado',en:'fish',ipa:'/pes.ˈka.ðo/',cat:'Food',ex:'El pescado está muy fresco.',exEn:'The fish is very fresh.',tip:'"Pescado" = fish (to eat). "Pez" = fish (alive in water).'},
+  {es:'pollo',en:'chicken',ipa:'/ˈpo.ʎo/',cat:'Food',ex:'Pollo asado.',exEn:'Roast chicken.',tip:''},
+  {es:'verduras',en:'vegetables',ipa:'/beɾ.ˈðu.ɾas/',cat:'Food',ex:'Me encantan las verduras frescas.',exEn:'I love fresh vegetables.',tip:''},
+  {es:'postre',en:'dessert',ipa:'/ˈpos.tɾe/',cat:'Food',ex:'¿Qué hay de postre?',exEn:'What is there for dessert?',tip:'"Flan" and "tarta de Santiago" are classic Spanish desserts.'},
+  {es:'desayuno',en:'breakfast',ipa:'/de.sa.ˈʝu.no/',cat:'Food',ex:'El desayuno está incluido.',exEn:'Breakfast is included.',tip:''},
+  {es:'almuerzo',en:'lunch',ipa:'/al.ˈmweɾ.θo/',cat:'Food',ex:'¿Comemos juntos?',exEn:'Shall we have lunch together?',tip:'In Spain, lunch is the main meal — often 2-4pm!'},
+  {es:'cena',en:'dinner',ipa:'/ˈθe.na/',cat:'Food',ex:'La cena es a las nueve.',exEn:'Dinner is at nine.',tip:'Spaniards eat dinner late — often after 9pm!'},
+  {es:'azúcar',en:'sugar',ipa:'/a.ˈθu.kaɾ/',cat:'Food',ex:'Con azúcar, por favor.',exEn:'With sugar, please.',tip:''},
+  {es:'sal',en:'salt',ipa:'/sal/',cat:'Food',ex:'Pásame la sal.',exEn:'Pass me the salt.',tip:''},
+  // ACTIONS (28)
+  {es:'ser',en:'to be (permanent)',ipa:'/seɾ/',cat:'Actions',ex:'Soy inglés.',exEn:'I am English.',tip:'Spanish has TWO "to be" verbs: ser (permanent) and estar (temporary). The biggest challenge!'},
+  {es:'estar',en:'to be (temporary)',ipa:'/es.ˈtaɾ/',cat:'Actions',ex:'Estoy bien, gracias.',exEn:'I am fine, thank you.',tip:'"Estoy" = right now/temporary. "Soy" = permanently.'},
+  {es:'tener',en:'to have',ipa:'/te.ˈneɾ/',cat:'Actions',ex:'Tengo hambre.',exEn:'I am hungry.',tip:'"Tener" is used for age and feelings: tengo 30 años, tengo hambre.'},
+  {es:'hacer',en:'to do / make',ipa:'/a.ˈθeɾ/',cat:'Actions',ex:'¿Qué haces?',exEn:'What are you doing?',tip:'"Hacer" is very versatile — hacer deporte, hacer una pregunta.'},
+  {es:'ir',en:'to go',ipa:'/iɾ/',cat:'Actions',ex:'Vamos a la playa.',exEn:'We are going to the beach.',tip:'"Ir a" + infinitive = near future: "voy a comer".'},
+  {es:'venir',en:'to come',ipa:'/be.ˈniɾ/',cat:'Actions',ex:'¿Puedes venir esta noche?',exEn:'Can you come tonight?',tip:''},
+  {es:'hablar',en:'to speak / talk',ipa:'/a.ˈblaɾ/',cat:'Actions',ex:'Hablo un poco de español.',exEn:'I speak a little Spanish.',tip:'-AR verbs: remove -ar, add -o, -as, -a, -amos, -áis, -an.'},
+  {es:'comer',en:'to eat',ipa:'/ko.ˈmeɾ/',cat:'Actions',ex:'Nos gusta comer fuera.',exEn:'We like eating out.',tip:'-ER verbs: remove -er, add -o, -es, -e, -emos, -éis, -en.'},
+  {es:'beber',en:'to drink',ipa:'/be.ˈβeɾ/',cat:'Actions',ex:'Quiero beber algo.',exEn:'I want to drink something.',tip:''},
+  {es:'entender',en:'to understand',ipa:'/en.ten.ˈdeɾ/',cat:'Actions',ex:'No entiendo.',exEn:'I do not understand.',tip:'Put "no" before the verb to negate.'},
+  {es:'saber',en:'to know (a fact)',ipa:'/sa.ˈβeɾ/',cat:'Actions',ex:'No sé.',exEn:'I do not know.',tip:'"Saber" = know facts. "Conocer" = know people/places.'},
+  {es:'querer',en:'to want / love',ipa:'/ke.ˈɾeɾ/',cat:'Actions',ex:'Quiero aprender español.',exEn:'I want to learn Spanish.',tip:'"Te quiero" = I love you (to a person). "Quiero" = I want (things).'},
+  {es:'poder',en:'to be able to / can',ipa:'/po.ˈðeɾ/',cat:'Actions',ex:'¿Puedes repetir?',exEn:'Can you repeat?',tip:'"¿Se puede?" = Is it allowed? Very useful phrase!'},
+  {es:'necesitar',en:'to need',ipa:'/ne.θe.si.ˈtaɾ/',cat:'Actions',ex:'Necesito ayuda.',exEn:'I need help.',tip:''},
+  {es:'gustar',en:'to like / please',ipa:'/ɡus.ˈtaɾ/',cat:'Actions',ex:'Me gusta el español.',exEn:'I like Spanish.',tip:'"Me gusta" = it pleases me. The subject is the thing liked, not the person!'},
+  {es:'buscar',en:'to look for',ipa:'/bus.ˈkaɾ/',cat:'Actions',ex:'Busco la farmacia.',exEn:'I am looking for the pharmacy.',tip:'Already means "to look for" — no "para" needed!'},
+  {es:'comprar',en:'to buy',ipa:'/kom.ˈpɾaɾ/',cat:'Actions',ex:'Quiero comprar un recuerdo.',exEn:'I want to buy a souvenir.',tip:''},
+  {es:'pagar',en:'to pay',ipa:'/pa.ˈɣaɾ/',cat:'Actions',ex:'Quiero pagar.',exEn:'I want to pay.',tip:'"La cuenta, por favor" = the bill, please.'},
+  {es:'llamar',en:'to call',ipa:'/ʎa.ˈmaɾ/',cat:'Actions',ex:'Voy a llamar un taxi.',exEn:'I am going to call a taxi.',tip:'"¿Cómo te llamas?" = What is your name? (How do you call yourself?)'},
+  {es:'reservar',en:'to book / reserve',ipa:'/re.seɾ.ˈβaɾ/',cat:'Actions',ex:'He reservado una mesa.',exEn:'I have booked a table.',tip:''},
+  {es:'esperar',en:'to wait / hope',ipa:'/es.pe.ˈɾaɾ/',cat:'Actions',ex:'Tengo que esperar.',exEn:'I have to wait.',tip:'"Esperar" = wait AND hope.'},
+  {es:'salir',en:'to leave / go out',ipa:'/sa.ˈliɾ/',cat:'Actions',ex:'Salgo mañana.',exEn:'I am leaving tomorrow.',tip:'"¿Salimos?" = shall we go out?'},
+  {es:'llegar',en:'to arrive',ipa:'/ʎe.ˈɣaɾ/',cat:'Actions',ex:'Llego al mediodía.',exEn:'I arrive at midday.',tip:''},
+  {es:'vivir',en:'to live',ipa:'/bi.ˈβiɾ/',cat:'Actions',ex:'Vivo en Londres.',exEn:'I live in London.',tip:'-IR verbs: remove -ir, add -o, -es, -e, -imos, -ís, -en.'},
+  {es:'trabajar',en:'to work',ipa:'/tɾa.βa.ˈxaɾ/',cat:'Actions',ex:'Trabajo de lunes a viernes.',exEn:'I work Monday to Friday.',tip:''},
+  {es:'estudiar',en:'to study',ipa:'/es.tu.ˈðjaɾ/',cat:'Actions',ex:'Estudio español cada día.',exEn:'I study Spanish every day.',tip:''},
+  {es:'ver',en:'to see / watch',ipa:'/beɾ/',cat:'Actions',ex:'Nos vemos mañana.',exEn:'See you tomorrow.',tip:'"Nos vemos" = see you — very common farewell.'},
+  {es:'dar',en:'to give',ipa:'/daɾ/',cat:'Actions',ex:'Dame tu tarjeta.',exEn:'Give me your card.',tip:'"Dame" = give me (informal command).'},
+  // DESCRIPTIONS (22)
+  {es:'grande',en:'big / large',ipa:'/ˈɡɾan.de/',cat:'Descriptions',ex:'Es un museo muy grande.',exEn:'It is a very large museum.',tip:'Adjectives come AFTER the noun in Spanish.'},
+  {es:'pequeño / pequeña',en:'small / little',ipa:'/pe.ˈke.ɲo/',cat:'Descriptions',ex:'Un café pequeño.',exEn:'A small coffee.',tip:'Adjectives agree with noun gender: pequeño (m) / pequeña (f).'},
+  {es:'bonito / bonita',en:'beautiful / pretty',ipa:'/bo.ˈni.to/',cat:'Descriptions',ex:'¡Qué día tan bonito!',exEn:'What a beautiful day!',tip:'"Guapo/guapa" = handsome/beautiful (for people).'},
+  {es:'bueno / buena',en:'good',ipa:'/ˈbwe.no/',cat:'Descriptions',ex:'La comida estaba muy buena.',exEn:'The food was very good.',tip:'"Bueno" becomes "buen" before a masculine noun.'},
+  {es:'malo / mala',en:'bad',ipa:'/ˈma.lo/',cat:'Descriptions',ex:'El tiempo está malo.',exEn:'The weather is bad.',tip:'"Malo" becomes "mal" before a masculine noun.'},
+  {es:'caro / cara',en:'expensive',ipa:'/ˈka.ɾo/',cat:'Descriptions',ex:'Es un poco caro.',exEn:'It is a bit expensive.',tip:''},
+  {es:'gratis',en:'free (no cost)',ipa:'/ˈɡɾa.tis/',cat:'Descriptions',ex:'La entrada es gratis.',exEn:'Entry is free.',tip:'Same for both genders — never changes.'},
+  {es:'caliente',en:'hot / warm',ipa:'/ka.ˈljen.te/',cat:'Descriptions',ex:'El café está muy caliente.',exEn:'The coffee is very hot.',tip:'"Tener calor" = to feel hot.'},
+  {es:'frío / fría',en:'cold',ipa:'/ˈfɾi.o/',cat:'Descriptions',ex:'Hoy hace frío.',exEn:'It is cold today.',tip:'"Tener frío" = to feel cold.'},
+  {es:'nuevo / nueva',en:'new',ipa:'/ˈnwe.βo/',cat:'Descriptions',ex:'Tengo un bolso nuevo.',exEn:'I have a new bag.',tip:''},
+  {es:'viejo / vieja',en:'old',ipa:'/ˈbje.xo/',cat:'Descriptions',ex:'Este edificio es muy viejo.',exEn:'This building is very old.',tip:'For people, "mayor" (older) is more polite.'},
+  {es:'rápido / rápida',en:'fast / quick',ipa:'/ˈra.pi.ðo/',cat:'Descriptions',ex:'El AVE es muy rápido.',exEn:'The AVE is very fast.',tip:'Add "-mente" to make adverbs: "rápidamente".'},
+  {es:'despacio',en:'slow / slowly',ipa:'/des.ˈpa.θjo/',cat:'Descriptions',ex:'Habla más despacio, por favor.',exEn:'Please speak more slowly.',tip:'Already an adverb — no "-mente" needed!'},
+  {es:'fácil',en:'easy',ipa:'/ˈfa.θil/',cat:'Descriptions',ex:'El español no es fácil.',exEn:'Spanish is not easy.',tip:'Same for both genders.'},
+  {es:'difícil',en:'difficult',ipa:'/di.ˈfi.θil/',cat:'Descriptions',ex:'La gramática es difícil.',exEn:'Grammar is difficult.',tip:''},
+  {es:'feliz',en:'happy',ipa:'/fe.ˈliθ/',cat:'Descriptions',ex:'Estoy muy feliz.',exEn:'I am very happy.',tip:'Use "estar". Same for both genders.'},
+  {es:'cansado / cansada',en:'tired',ipa:'/kan.ˈsa.ðo/',cat:'Descriptions',ex:'Estoy muy cansado.',exEn:'I am very tired.',tip:'Use "estar" for temporary states.'},
+  {es:'enfermo / enferma',en:'ill / sick',ipa:'/en.ˈfeɾ.mo/',cat:'Descriptions',ex:'Me siento enfermo.',exEn:'I feel sick.',tip:''},
+  {es:'limpio / limpia',en:'clean',ipa:'/ˈlim.pjo/',cat:'Descriptions',ex:'La habitación está limpia.',exEn:'The room is clean.',tip:''},
+  {es:'lleno / llena',en:'full',ipa:'/ˈʎe.no/',cat:'Descriptions',ex:'El vaso está lleno.',exEn:'The glass is full.',tip:'"Lleno de" = full of.'},
+  {es:'vacío / vacía',en:'empty',ipa:'/ba.ˈθi.o/',cat:'Descriptions',ex:'La botella está vacía.',exEn:'The bottle is empty.',tip:''},
+  {es:'guapo / guapa',en:'handsome / beautiful',ipa:'/ˈɡwa.po/',cat:'Descriptions',ex:'¡Qué guapa estás!',exEn:'You look beautiful!',tip:'Use with "estar" for how someone looks right now.'},
+  // TRAVEL (16)
+  {es:'billete',en:'ticket',ipa:'/bi.ˈʎe.te/',cat:'Travel',ex:'Un billete de ida y vuelta.',exEn:'A return ticket.',tip:'"Ida y vuelta" = return. "Solo ida" = one way.'},
+  {es:'pasaporte',en:'passport',ipa:'/pa.sa.ˈpoɾ.te/',cat:'Travel',ex:'Mi pasaporte es válido.',exEn:'My passport is valid.',tip:''},
+  {es:'maleta',en:'suitcase',ipa:'/ma.ˈle.ta/',cat:'Travel',ex:'He perdido mi maleta.',exEn:'I have lost my suitcase.',tip:'"Mochila" = backpack.'},
+  {es:'taxi',en:'taxi',ipa:'/ˈtak.si/',cat:'Travel',ex:'Voy a llamar un taxi.',exEn:'I am going to call a taxi.',tip:''},
+  {es:'tren',en:'train',ipa:'/tɾen/',cat:'Travel',ex:'El tren sale a las nueve.',exEn:'The train leaves at nine.',tip:'Spain has the excellent high-speed AVE trains!'},
+  {es:'avión',en:'plane',ipa:'/a.ˈβjon/',cat:'Travel',ex:'El avión despega a mediodía.',exEn:'The plane takes off at midday.',tip:''},
+  {es:'metro',en:'metro / underground',ipa:'/ˈme.tɾo/',cat:'Travel',ex:'Coge el metro línea dos.',exEn:'Take metro line two.',tip:'"Coger el metro" = to take the metro (in Spain).'},
+  {es:'coche',en:'car',ipa:'/ˈko.tʃe/',cat:'Travel',ex:'Alquilo un coche.',exEn:'I am renting a car.',tip:'"Coche" in Spain. "Carro" in Latin America.'},
+  {es:'derecha',en:'right',ipa:'/de.ˈɾe.tʃa/',cat:'Travel',ex:'Gira a la derecha.',exEn:'Turn right.',tip:''},
+  {es:'izquierda',en:'left',ipa:'/iθ.ˈkjeɾ.ða/',cat:'Travel',ex:'Gira a la izquierda.',exEn:'Turn left.',tip:''},
+  {es:'todo recto',en:'straight ahead',ipa:'/ˈto.ðo ˈrek.to/',cat:'Travel',ex:'Sigue todo recto.',exEn:'Go straight ahead.',tip:'"Sigue" = continue/follow.'},
+  {es:'cerca de',en:'near / close to',ipa:'/ˈθeɾ.ka ðe/',cat:'Travel',ex:'Está cerca de la plaza.',exEn:'It is near the square.',tip:''},
+  {es:'lejos de',en:'far from',ipa:'/ˈle.xos ðe/',cat:'Travel',ex:'Está lejos de aquí.',exEn:'It is far from here.',tip:'"De aquí" = from here.'},
+  {es:'norte',en:'north',ipa:'/ˈnoɾ.te/',cat:'Travel',ex:'Al norte de España.',exEn:'In the north of Spain.',tip:'norte, sur, este, oeste.'},
+  {es:'sur',en:'south',ipa:'/suɾ/',cat:'Travel',ex:'Andalucía está al sur.',exEn:'Andalucia is in the south.',tip:''},
+  {es:'mapa',en:'map',ipa:'/ˈma.pa/',cat:'Travel',ex:'¿Tienes un mapa de la ciudad?',exEn:'Do you have a city map?',tip:'"Mapa" is masculine: "el mapa".'},
+  // HEALTH (10)
+  {es:'médico / médica',en:'doctor',ipa:'/ˈme.ði.ko/',cat:'Health',ex:'Necesito un médico.',exEn:'I need a doctor.',tip:''},
+  {es:'dolor',en:'pain',ipa:'/do.ˈloɾ/',cat:'Health',ex:'Tengo dolor aquí.',exEn:'I have pain here.',tip:'"Dolor de cabeza" = headache. "Dolor de estómago" = stomachache.'},
+  {es:'alergia',en:'allergy',ipa:'/a.ˈleɾ.xja/',cat:'Health',ex:'Tengo alergia a los frutos secos.',exEn:'I have a nut allergy.',tip:''},
+  {es:'medicamento',en:'medicine',ipa:'/me.ði.ka.ˈmen.to/',cat:'Health',ex:'Necesito medicamentos.',exEn:'I need medication.',tip:''},
+  {es:'urgencia',en:'emergency',ipa:'/uɾ.ˈxen.θja/',cat:'Health',ex:'Es una urgencia.',exEn:'It is an emergency.',tip:'112 = European emergency number.'},
+  {es:'ambulancia',en:'ambulance',ipa:'/am.bu.ˈlan.θja/',cat:'Health',ex:'Llame a una ambulancia.',exEn:'Call an ambulance.',tip:''},
+  {es:'fiebre',en:'fever',ipa:'/ˈfje.βɾe/',cat:'Health',ex:'Tengo fiebre.',exEn:'I have a fever.',tip:''},
+  {es:'tos',en:'cough',ipa:'/tos/',cat:'Health',ex:'Tengo tos.',exEn:'I have a cough.',tip:''},
+  {es:'herida',en:'wound / injury',ipa:'/e.ˈɾi.ða/',cat:'Health',ex:'Tengo una herida en la rodilla.',exEn:'I have a wound on my knee.',tip:'"Herido/herida" = injured.'},
+  {es:'receta',en:'prescription / recipe',ipa:'/re.ˈθe.ta/',cat:'Health',ex:'Necesito una receta médica.',exEn:'I need a prescription.',tip:'"Receta" = prescription AND recipe! Context tells you which.'},
+  // WEATHER (12)
+  {es:'tiempo',en:'weather',ipa:'/ˈtjem.po/',cat:'Weather',ex:'¿Qué tiempo hace?',exEn:'What is the weather like?',tip:'"Hace" is used for weather: hace calor, hace frío, hace sol.'},
+  {es:'sol',en:'sun / sunshine',ipa:'/sol/',cat:'Weather',ex:'Hace sol.',exEn:'It is sunny.',tip:'"Tomar el sol" = to sunbathe.'},
+  {es:'lluvia',en:'rain',ipa:'/ˈʎu.βja/',cat:'Weather',ex:'Va a llover.',exEn:'It is going to rain.',tip:'"Está lloviendo" = it is raining.'},
+  {es:'viento',en:'wind',ipa:'/ˈbjen.to/',cat:'Weather',ex:'Hace mucho viento.',exEn:'It is very windy.',tip:''},
+  {es:'nube',en:'cloud',ipa:'/ˈnu.βe/',cat:'Weather',ex:'Hay muchas nubes.',exEn:'It is cloudy.',tip:'"Nublado" = cloudy.'},
+  {es:'nieve',en:'snow',ipa:'/ˈnje.βe/',cat:'Weather',ex:'Nieva en invierno.',exEn:'It snows in winter.',tip:'"Está nevando" = it is snowing.'},
+  {es:'calor',en:'heat / hot weather',ipa:'/ka.ˈloɾ/',cat:'Weather',ex:'Hace mucho calor.',exEn:'It is very hot.',tip:'"Tener calor" = to feel hot.'},
+  {es:'tormenta',en:'storm',ipa:'/toɾ.ˈmen.ta/',cat:'Weather',ex:'Hay tormenta esta noche.',exEn:'There is a storm tonight.',tip:''},
+  {es:'primavera',en:'spring',ipa:'/pɾi.ma.ˈβe.ɾa/',cat:'Weather',ex:'La primavera es mi estación favorita.',exEn:'Spring is my favourite season.',tip:'primavera, verano, otoño, invierno.'},
+  {es:'verano',en:'summer',ipa:'/be.ˈɾa.no/',cat:'Weather',ex:'Me encanta el verano.',exEn:'I love summer.',tip:''},
+  {es:'otoño',en:'autumn',ipa:'/o.ˈto.ɲo/',cat:'Weather',ex:'Las hojas caen en otoño.',exEn:'The leaves fall in autumn.',tip:''},
+  {es:'invierno',en:'winter',ipa:'/im.ˈbjeɾ.no/',cat:'Weather',ex:'Hace frío en invierno.',exEn:'It is cold in winter.',tip:''},
+  // HOME (12)
+  {es:'habitación',en:'bedroom / room',ipa:'/a.βi.ta.ˈθjon/',cat:'Home',ex:'La habitación es cómoda.',exEn:'The room is comfortable.',tip:'"Cuarto de baño" = bathroom.'},
+  {es:'cocina',en:'kitchen / cooking',ipa:'/ko.ˈθi.na/',cat:'Home',ex:'Me encanta la cocina española.',exEn:'I love Spanish cooking.',tip:'"Cocina" = kitchen AND cuisine!'},
+  {es:'salón',en:'living room',ipa:'/sa.ˈlon/',cat:'Home',ex:'En el salón.',exEn:'In the living room.',tip:''},
+  {es:'baño',en:'bathroom',ipa:'/ˈba.ɲo/',cat:'Home',ex:'¿Dónde está el baño?',exEn:'Where is the bathroom?',tip:'Essential phrase! "Servicios" = toilets in public places.'},
+  {es:'cama',en:'bed',ipa:'/ˈka.ma/',cat:'Home',ex:'Me voy a la cama.',exEn:'I am going to bed.',tip:''},
+  {es:'móvil',en:'mobile phone',ipa:'/ˈmo.βil/',cat:'Home',ex:'Mi móvil está sin batería.',exEn:'My phone is out of battery.',tip:'"Móvil" in Spain. "Celular" in Latin America.'},
+  {es:'llave',en:'key',ipa:'/ˈʎa.βe/',cat:'Home',ex:'He perdido mi llave.',exEn:'I have lost my key.',tip:''},
+  {es:'dinero',en:'money',ipa:'/di.ˈne.ɾo/',cat:'Home',ex:'No tengo dinero.',exEn:'I do not have any money.',tip:'"Cambio" = change (coins back).'},
+  {es:'tarjeta de crédito',en:'credit card',ipa:'/taɾ.ˈxe.ta ðe ˈkɾe.ði.to/',cat:'Home',ex:'¿Aceptan tarjeta de crédito?',exEn:'Do you accept credit cards?',tip:''},
+  {es:'internet',en:'internet / Wi-Fi',ipa:'/in.teɾ.ˈnet/',cat:'Home',ex:'¿Tienen Wi-Fi?',exEn:'Do you have Wi-Fi?',tip:'"¿Cuál es la contraseña?" = What is the password?'},
+  {es:'ventana',en:'window',ipa:'/ben.ˈta.na/',cat:'Home',ex:'Abre la ventana, por favor.',exEn:'Open the window, please.',tip:''},
+  {es:'puerta',en:'door',ipa:'/ˈpweɾ.ta/',cat:'Home',ex:'Cierra la puerta.',exEn:'Close the door.',tip:''},
+  // EMOTIONS (12)
+  {es:'amor',en:'love',ipa:'/a.ˈmoɾ/',cat:'Emotions',ex:'El amor está en el aire.',exEn:'Love is in the air.',tip:'"Te quiero" = I love you (to people). "Me encanta" = I love (things).'},
+  {es:'alegría',en:'joy / happiness',ipa:'/a.le.ˈɣɾi.a/',cat:'Emotions',ex:'¡Qué alegría verte!',exEn:'What a joy to see you!',tip:'"Alegre" = happy (adjective).'},
+  {es:'miedo',en:'fear',ipa:'/ˈmje.ðo/',cat:'Emotions',ex:'Tengo miedo.',exEn:'I am scared.',tip:'"Tener miedo" = to be afraid.'},
+  {es:'enfado',en:'anger',ipa:'/en.ˈfa.ðo/',cat:'Emotions',ex:'Estoy enfadado.',exEn:'I am angry.',tip:'"Estar enfadado" = to be angry.'},
+  {es:'tristeza',en:'sadness',ipa:'/tɾis.ˈte.θa/',cat:'Emotions',ex:'Siento tristeza.',exEn:'I feel sadness.',tip:'"Triste" = sad.'},
+  {es:'sorpresa',en:'surprise',ipa:'/soɾ.ˈpɾe.sa/',cat:'Emotions',ex:'¡Qué sorpresa!',exEn:'What a surprise!',tip:''},
+  {es:'orgullo',en:'pride',ipa:'/oɾ.ˈɣu.ʎo/',cat:'Emotions',ex:'Estoy muy orgulloso de ti.',exEn:'I am very proud of you.',tip:'"Orgulloso/orgullosa" = proud.'},
+  {es:'nervioso / nerviosa',en:'nervous',ipa:'/neɾ.ˈβjo.so/',cat:'Emotions',ex:'Estoy nervioso.',exEn:'I am nervous.',tip:'Use "estar".'},
+  {es:'tranquilo / tranquila',en:'calm',ipa:'/tɾaŋ.ˈki.lo/',cat:'Emotions',ex:'Tranquilo, no pasa nada.',exEn:'Calm down, nothing is wrong.',tip:'"Tranquilo" alone = calm down!'},
+  {es:'contento / contenta',en:'pleased / happy',ipa:'/kon.ˈten.to/',cat:'Emotions',ex:'Estoy muy contento.',exEn:'I am very pleased.',tip:'Use "estar".'},
+  {es:'cariño',en:'affection / darling',ipa:'/ka.ˈɾi.ɲo/',cat:'Emotions',ex:'Con mucho cariño.',exEn:'With much affection.',tip:'Also used as a term of endearment: "cariño" = darling.'},
+  {es:'timido / timida',en:'shy / timid',ipa:'/ˈti.mi.ðo/',cat:'Emotions',ex:'Es un poco tímido.',exEn:'He is a little shy.',tip:''},
+  // SHOPPING (15)
+  {es:'precio',en:'price',ipa:'/ˈpɾe.θjo/',cat:'Shopping',ex:'¿Cuál es el precio?',exEn:'What is the price?',tip:''},
+  {es:'descuento',en:'discount',ipa:'/des.ˈkwen.to/',cat:'Shopping',ex:'¿Hay descuento?',exEn:'Is there a discount?',tip:'"Rebajas" = sales. "En oferta" = on special offer.'},
+  {es:'rebajas',en:'sales',ipa:'/re.ˈβa.xas/',cat:'Shopping',ex:'Las rebajas de enero.',exEn:'The January sales.',tip:'Spanish sales are a big cultural event — January and July!'},
+  {es:'talla',en:'size (clothing)',ipa:'/ˈta.ʎa/',cat:'Shopping',ex:'¿Cuál es tu talla?',exEn:'What is your size?',tip:'"Número" = shoe size.'},
+  {es:'color',en:'colour',ipa:'/ko.ˈloɾ/',cat:'Shopping',ex:'Me gusta este color.',exEn:'I like this colour.',tip:''},
+  {es:'rojo / roja',en:'red',ipa:'/ˈro.xo/',cat:'Shopping',ex:'El vestido rojo.',exEn:'The red dress.',tip:''},
+  {es:'azul',en:'blue',ipa:'/a.ˈθul/',cat:'Shopping',ex:'Un jersey azul.',exEn:'A blue jumper.',tip:'"Azul" is the same for both genders.'},
+  {es:'verde',en:'green',ipa:'/ˈbeɾ.ðe/',cat:'Shopping',ex:'Los zapatos verdes.',exEn:'The green shoes.',tip:'"Verde" is same for both genders.'},
+  {es:'negro / negra',en:'black',ipa:'/ˈne.ɣɾo/',cat:'Shopping',ex:'Un bolso negro.',exEn:'A black bag.',tip:''},
+  {es:'blanco / blanca',en:'white',ipa:'/ˈblaŋ.ko/',cat:'Shopping',ex:'Una camisa blanca.',exEn:'A white shirt.',tip:''},
+  {es:'regalo',en:'gift / present',ipa:'/re.ˈɣa.lo/',cat:'Shopping',ex:'Busco un regalo.',exEn:'I am looking for a gift.',tip:'"Hacer un regalo" = to give a gift.'},
+  {es:'caja',en:'checkout / cashier',ipa:'/ˈka.xa/',cat:'Shopping',ex:'La caja está allí.',exEn:'The checkout is over there.',tip:'"Cajero automático" = ATM.'},
+  {es:'recibo',en:'receipt',ipa:'/re.ˈθi.βo/',cat:'Shopping',ex:'¿Me da un recibo?',exEn:'Can I have a receipt?',tip:''},
+  {es:'cambio',en:'change (money)',ipa:'/ˈkam.bjo/',cat:'Shopping',ex:'¿Tiene cambio?',exEn:'Do you have change?',tip:'"Cambio" = change/coins returned.'},
+  {es:'escaparate',en:'shop window',ipa:'/es.ka.pa.ˈɾa.te/',cat:'Shopping',ex:'Lo vi en el escaparate.',exEn:'I saw it in the shop window.',tip:'A very Spanish word — window shopping is "mirar escaparates".'},
+  // NATURE (15)
+  {es:'mar',en:'sea',ipa:'/maɾ/',cat:'Nature',ex:'El mar está precioso.',exEn:'The sea is beautiful.',tip:'"Mar" can be masculine or feminine in Spanish!'},
+  {es:'montaña',en:'mountain',ipa:'/mon.ˈta.ɲa/',cat:'Nature',ex:'Me encantan las montañas.',exEn:'I love the mountains.',tip:'Spain has the Pyrenees and Sierra Nevada!'},
+  {es:'bosque',en:'forest / wood',ipa:'/ˈbos.ke/',cat:'Nature',ex:'El bosque es magnífico.',exEn:'The forest is magnificent.',tip:''},
+  {es:'río',en:'river',ipa:'/ˈri.o/',cat:'Nature',ex:'El río Tajo.',exEn:'The Tagus river.',tip:''},
+  {es:'lago',en:'lake',ipa:'/ˈla.ɣo/',cat:'Nature',ex:'El lago es tranquilo.',exEn:'The lake is peaceful.',tip:''},
+  {es:'árbol',en:'tree',ipa:'/ˈaɾ.βol/',cat:'Nature',ex:'Hay árboles preciosos en el parque.',exEn:'There are beautiful trees in the park.',tip:''},
+  {es:'flor',en:'flower',ipa:'/floɾ/',cat:'Nature',ex:'Las flores son preciosas.',exEn:'The flowers are beautiful.',tip:''},
+  {es:'animal',en:'animal',ipa:'/a.ni.ˈmal/',cat:'Nature',ex:'Me encantan los animales.',exEn:'I love animals.',tip:'Plural: "animales".'},
+  {es:'perro',en:'dog',ipa:'/ˈpe.ro/',cat:'Nature',ex:'Mi perro se llama Max.',exEn:'My dog is called Max.',tip:'"Perra" = female dog. "Perrito" = puppy.'},
+  {es:'gato',en:'cat',ipa:'/ˈɡa.to/',cat:'Nature',ex:'El gato duerme en el sofá.',exEn:'The cat sleeps on the sofa.',tip:''},
+  {es:'pájaro',en:'bird',ipa:'/ˈpa.xa.ɾo/',cat:'Nature',ex:'Los pájaros cantan por la mañana.',exEn:'The birds sing in the morning.',tip:'Spain has incredible birdlife — flamingos in Andalucia!'},
+  {es:'cielo',en:'sky',ipa:'/ˈθje.lo/',cat:'Nature',ex:'El cielo está azul hoy.',exEn:'The sky is blue today.',tip:''},
+  {es:'sol',en:'sun',ipa:'/sol/',cat:'Nature',ex:'El sol brilla.',exEn:'The sun is shining.',tip:'"Tomar el sol" = to sunbathe.'},
+  {es:'estrella',en:'star',ipa:'/es.ˈtɾe.ʎa/',cat:'Nature',ex:'Las estrellas brillan de noche.',exEn:'The stars shine at night.',tip:'Spain has some of the best stargazing in Europe!'},
+  {es:'luna',en:'moon',ipa:'/ˈlu.na/',cat:'Nature',ex:'La luna está llena esta noche.',exEn:'The moon is full tonight.',tip:'"Luna llena" = full moon.'},
+];
+
+const verbs=[
+  {es:'ser',en:'to be (permanent)',type:'irregular',tip:'One of two "to be" verbs. Use for permanent traits: identity, nationality, profession. Past: "fui" (shared with ir — context tells them apart!).',
+   present:{forms:[{p:'yo',f:'soy'},{p:'tú',f:'eres'},{p:'él/ella/usted',f:'es'},{p:'nosotros',f:'somos'},{p:'vosotros',f:'sois'},{p:'ellos/ustedes',f:'son'}],note:'For identity, nationality, profession, permanent characteristics. "Soy inglés" = I am English.'},
+   past:{forms:[{p:'yo',f:'fui'},{p:'tú',f:'fuiste'},{p:'él/ella',f:'fue'},{p:'nosotros',f:'fuimos'},{p:'vosotros',f:'fuisteis'},{p:'ellos',f:'fueron'}],note:'Pretérito indefinido. "Fui" = I was. Same forms as "ir" past — context tells them apart!'},
+   future:{forms:[{p:'yo',f:'seré'},{p:'tú',f:'serás'},{p:'él/ella',f:'será'},{p:'nosotros',f:'seremos'},{p:'vosotros',f:'seréis'},{p:'ellos',f:'serán'}],note:'Simple future. Also "voy a ser" (near future) = I am going to be.'},
+   examples:[{es:'Fui muy feliz de niño.',en:'I was very happy as a child.'},{es:'Seré médico.',en:'I will be a doctor.'}]},
+  {es:'estar',en:'to be (temporary)',type:'irregular',tip:'Use for temporary states, feelings, locations. The distinction between ser and estar is the biggest challenge in Spanish!',
+   present:{forms:[{p:'yo',f:'estoy'},{p:'tú',f:'estás'},{p:'él/ella/usted',f:'está'},{p:'nosotros',f:'estamos'},{p:'vosotros',f:'estáis'},{p:'ellos/ustedes',f:'están'}],note:'For temporary states, feelings, location. "Estoy cansado" = I am tired (right now).'},
+   past:{forms:[{p:'yo',f:'estuve'},{p:'tú',f:'estuviste'},{p:'él/ella',f:'estuvo'},{p:'nosotros',f:'estuvimos'},{p:'vosotros',f:'estuvisteis'},{p:'ellos',f:'estuvieron'}],note:'Pretérito indefinido. "Estuve" = I was (completed). "Estaba" = I was (imperfect/ongoing).'},
+   future:{forms:[{p:'yo',f:'estaré'},{p:'tú',f:'estarás'},{p:'él/ella',f:'estará'},{p:'nosotros',f:'estaremos'},{p:'vosotros',f:'estaréis'},{p:'ellos',f:'estarán'}],note:'Simple future. "Voy a estar" = I am going to be.'},
+   examples:[{es:'Estuve muy cansado ayer.',en:'I was very tired yesterday.'},{es:'Mañana estaré en casa.',en:'Tomorrow I will be at home.'}]},
+  {es:'tener',en:'to have',type:'irregular',tip:'Used for possession and many idiomatic expressions: tener hambre (hungry), tener frío (cold), tener miedo (scared), tener... años (age).',
+   present:{forms:[{p:'yo',f:'tengo'},{p:'tú',f:'tienes'},{p:'él/ella/usted',f:'tiene'},{p:'nosotros',f:'tenemos'},{p:'vosotros',f:'tenéis'},{p:'ellos/ustedes',f:'tienen'}],note:'For possession and feelings. "Tengo 30 años" = I am 30. "Tengo hambre" = I am hungry.'},
+   past:{forms:[{p:'yo',f:'tuve'},{p:'tú',f:'tuviste'},{p:'él/ella',f:'tuvo'},{p:'nosotros',f:'tuvimos'},{p:'vosotros',f:'tuvisteis'},{p:'ellos',f:'tuvieron'}],note:'Irregular past. "Tuve" = I had (completed). "Tenía" = I used to have (imperfect).'},
+   future:{forms:[{p:'yo',f:'tendré'},{p:'tú',f:'tendrás'},{p:'él/ella',f:'tendrá'},{p:'nosotros',f:'tendremos'},{p:'vosotros',f:'tendréis'},{p:'ellos',f:'tendrán'}],note:'Irregular future! tendr + endings.'},
+   examples:[{es:'Tuve un problema ayer.',en:'I had a problem yesterday.'},{es:'Mañana tendré tiempo.',en:'Tomorrow I will have time.'}]},
+  {es:'hacer',en:'to do / make',type:'irregular',tip:'Past: hice (I did/made). Very irregular! Very common: ¿Qué hiciste ayer? = What did you do yesterday?',
+   present:{forms:[{p:'yo',f:'hago'},{p:'tú',f:'haces'},{p:'él/ella/usted',f:'hace'},{p:'nosotros',f:'hacemos'},{p:'vosotros',f:'hacéis'},{p:'ellos/ustedes',f:'hacen'}],note:'Very versatile: hacer deporte, hacer una pregunta, hace calor, hace buen tiempo.'},
+   past:{forms:[{p:'yo',f:'hice'},{p:'tú',f:'hiciste'},{p:'él/ella',f:'hizo'},{p:'nosotros',f:'hicimos'},{p:'vosotros',f:'hicisteis'},{p:'ellos',f:'hicieron'}],note:'Highly irregular past! "Hice" = I did/made. Note: él/ella = hizo (not hice).'},
+   future:{forms:[{p:'yo',f:'haré'},{p:'tú',f:'harás'},{p:'él/ella',f:'hará'},{p:'nosotros',f:'haremos'},{p:'vosotros',f:'haréis'},{p:'ellos',f:'harán'}],note:'Irregular future! har + endings.'},
+   examples:[{es:'¿Qué hiciste el fin de semana?',en:'What did you do at the weekend?'},{es:'Haré la cena esta noche.',en:'I will make dinner tonight.'}]},
+  {es:'ir',en:'to go',type:'irregular',tip:'Past of "ir" = "fui" — same as "ser" past! Context tells them apart. "Voy a" + infinitive = near future (very commonly used).',
+   present:{forms:[{p:'yo',f:'voy'},{p:'tú',f:'vas'},{p:'él/ella/usted',f:'va'},{p:'nosotros',f:'vamos'},{p:'vosotros',f:'vais'},{p:'ellos/ustedes',f:'van'}],note:'"Voy a" + infinitive = near future: "voy a comer" = I am going to eat.'},
+   past:{forms:[{p:'yo',f:'fui'},{p:'tú',f:'fuiste'},{p:'él/ella',f:'fue'},{p:'nosotros',f:'fuimos'},{p:'vosotros',f:'fuisteis'},{p:'ellos',f:'fueron'}],note:'Same forms as "ser" past! "Fui al mercado" = I went to the market.'},
+   future:{forms:[{p:'yo',f:'iré'},{p:'tú',f:'irás'},{p:'él/ella',f:'irá'},{p:'nosotros',f:'iremos'},{p:'vosotros',f:'iréis'},{p:'ellos',f:'irán'}],note:'Simple future. "Voy a ir" (near future) is more common in everyday speech.'},
+   examples:[{es:'Fui al mercado ayer.',en:'I went to the market yesterday.'},{es:'Iremos a España este verano.',en:'We will go to Spain this summer.'}]},
+  {es:'querer',en:'to want / love',type:'irregular',tip:'Past: quise (I wanted). "Te quiero" = I love you (to people). "Quiero" + infinitive = I want to...',
+   present:{forms:[{p:'yo',f:'quiero'},{p:'tú',f:'quieres'},{p:'él/ella/usted',f:'quiere'},{p:'nosotros',f:'queremos'},{p:'vosotros',f:'queréis'},{p:'ellos/ustedes',f:'quieren'}],note:'"Quiero" = I want. "Te quiero" = I love you. "Quisiera" = I would like (polite).'},
+   past:{forms:[{p:'yo',f:'quise'},{p:'tú',f:'quisiste'},{p:'él/ella',f:'quiso'},{p:'nosotros',f:'quisimos'},{p:'vosotros',f:'quisisteis'},{p:'ellos',f:'quisieron'}],note:'Irregular past. "Quise" = I wanted. "Quería" = I used to want (imperfect).'},
+   future:{forms:[{p:'yo',f:'querré'},{p:'tú',f:'querrás'},{p:'él/ella',f:'querrá'},{p:'nosotros',f:'querremos'},{p:'vosotros',f:'querréis'},{p:'ellos',f:'querrán'}],note:'Irregular future! querr + endings.'},
+   examples:[{es:'No quise salir ayer.',en:'I did not want to go out yesterday.'},{es:'¿Querrás venir mañana?',en:'Will you want to come tomorrow?'}]},
+  {es:'poder',en:'to be able to / can',type:'irregular',tip:'Past: pude (I was able to). "No pude venir" = I was not able to come. "¿Se puede?" = Is it allowed?',
+   present:{forms:[{p:'yo',f:'puedo'},{p:'tú',f:'puedes'},{p:'él/ella/usted',f:'puede'},{p:'nosotros',f:'podemos'},{p:'vosotros',f:'podéis'},{p:'ellos/ustedes',f:'pueden'}],note:'"¿Puedo...?" = May I...? "¿Se puede?" = Is it allowed? Very useful!'},
+   past:{forms:[{p:'yo',f:'pude'},{p:'tú',f:'pudiste'},{p:'él/ella',f:'pudo'},{p:'nosotros',f:'pudimos'},{p:'vosotros',f:'pudisteis'},{p:'ellos',f:'pudieron'}],note:'Irregular past. "Pude" = I was able to. "No pude venir" = I could not come.'},
+   future:{forms:[{p:'yo',f:'podré'},{p:'tú',f:'podrás'},{p:'él/ella',f:'podrá'},{p:'nosotros',f:'podremos'},{p:'vosotros',f:'podréis'},{p:'ellos',f:'podrán'}],note:'Irregular future! podr + endings.'},
+   examples:[{es:'No pude venir ayer.',en:'I was not able to come yesterday.'},{es:'Mañana podré ayudarte.',en:'Tomorrow I will be able to help you.'}]},
+  {es:'hablar',en:'to speak / talk',type:'-AR regular',tip:'The model for ALL regular -AR verbs. Past: add -é (yo) to the stem: "hablé" = I spoke.',
+   present:{forms:[{p:'yo',f:'hablo'},{p:'tú',f:'hablas'},{p:'él/ella/usted',f:'habla'},{p:'nosotros',f:'hablamos'},{p:'vosotros',f:'habláis'},{p:'ellos/ustedes',f:'hablan'}],note:'Regular -AR: remove -ar, add -o, -as, -a, -amos, -áis, -an.'},
+   past:{forms:[{p:'yo',f:'hablé'},{p:'tú',f:'hablaste'},{p:'él/ella',f:'habló'},{p:'nosotros',f:'hablamos'},{p:'vosotros',f:'hablasteis'},{p:'ellos',f:'hablaron'}],note:'Regular -AR past: -é, -aste, -ó, -amos, -asteis, -aron. "Hablé" = I spoke.'},
+   future:{forms:[{p:'yo',f:'hablaré'},{p:'tú',f:'hablarás'},{p:'él/ella',f:'hablará'},{p:'nosotros',f:'hablaremos'},{p:'vosotros',f:'hablaréis'},{p:'ellos',f:'hablarán'}],note:'Future: keep infinitive (hablar) + -é, -ás, -á, -emos, -éis, -án. Works for all regular verbs!'},
+   examples:[{es:'Hablé con él ayer.',en:'I spoke to him yesterday.'},{es:'Hablaré contigo mañana.',en:'I will speak to you tomorrow.'}]},
+  {es:'comer',en:'to eat',type:'-ER regular',tip:'Model for regular -ER verbs. Past: "comí" (I ate). "¿Qué comiste?" = What did you eat?',
+   present:{forms:[{p:'yo',f:'como'},{p:'tú',f:'comes'},{p:'él/ella/usted',f:'come'},{p:'nosotros',f:'comemos'},{p:'vosotros',f:'coméis'},{p:'ellos/ustedes',f:'comen'}],note:'Regular -ER: remove -er, add -o, -es, -e, -emos, -éis, -en.'},
+   past:{forms:[{p:'yo',f:'comí'},{p:'tú',f:'comiste'},{p:'él/ella',f:'comió'},{p:'nosotros',f:'comimos'},{p:'vosotros',f:'comisteis'},{p:'ellos',f:'comieron'}],note:'Regular -ER past: -í, -iste, -ió, -imos, -isteis, -ieron. "Comí" = I ate.'},
+   future:{forms:[{p:'yo',f:'comeré'},{p:'tú',f:'comerás'},{p:'él/ella',f:'comerá'},{p:'nosotros',f:'comeremos'},{p:'vosotros',f:'comeréis'},{p:'ellos',f:'comerán'}],note:'Future: comer + -é, -ás, -á, -emos, -éis, -án.'},
+   examples:[{es:'¿Qué comiste en el restaurante?',en:'What did you eat at the restaurant?'},{es:'Comeré paella mañana.',en:'I will eat paella tomorrow.'}]},
+  {es:'vivir',en:'to live',type:'-IR regular',tip:'Model for regular -IR verbs. Past: "viví" (I lived). Same past endings as -ER verbs!',
+   present:{forms:[{p:'yo',f:'vivo'},{p:'tú',f:'vives'},{p:'él/ella/usted',f:'vive'},{p:'nosotros',f:'vivimos'},{p:'vosotros',f:'vivís'},{p:'ellos/ustedes',f:'viven'}],note:'Regular -IR: remove -ir, add -o, -es, -e, -imos, -ís, -en.'},
+   past:{forms:[{p:'yo',f:'viví'},{p:'tú',f:'viviste'},{p:'él/ella',f:'vivió'},{p:'nosotros',f:'vivimos'},{p:'vosotros',f:'vivisteis'},{p:'ellos',f:'vivieron'}],note:'Regular -IR past: same endings as -ER! "Viví" = I lived.'},
+   future:{forms:[{p:'yo',f:'viviré'},{p:'tú',f:'vivirás'},{p:'él/ella',f:'vivirá'},{p:'nosotros',f:'viviremos'},{p:'vosotros',f:'viviréis'},{p:'ellos',f:'vivirán'}],note:'Future: vivir + -é, -ás, -á, -emos, -éis, -án.'},
+   examples:[{es:'Viví en Madrid durante dos años.',en:'I lived in Madrid for two years.'},{es:'Viviré en España.',en:'I will live in Spain.'}]},
+  {es:'saber',en:'to know (a fact)',type:'irregular',tip:'Past: supe (I knew/found out). Different from "conocer" (to know people/places). "Sé nadar" = I know how to swim.',
+   present:{forms:[{p:'yo',f:'sé'},{p:'tú',f:'sabes'},{p:'él/ella/usted',f:'sabe'},{p:'nosotros',f:'sabemos'},{p:'vosotros',f:'sabéis'},{p:'ellos/ustedes',f:'saben'}],note:'"Saber" = know facts/how to do things. "Sé cocinar" = I know how to cook.'},
+   past:{forms:[{p:'yo',f:'supe'},{p:'tú',f:'supiste'},{p:'él/ella',f:'supo'},{p:'nosotros',f:'supimos'},{p:'vosotros',f:'supisteis'},{p:'ellos',f:'supieron'}],note:'Irregular past. "Supe" = I found out/knew.'},
+   future:{forms:[{p:'yo',f:'sabré'},{p:'tú',f:'sabrás'},{p:'él/ella',f:'sabrá'},{p:'nosotros',f:'sabremos'},{p:'vosotros',f:'sabréis'},{p:'ellos',f:'sabrán'}],note:'Irregular future! sabr + endings.'},
+   examples:[{es:'Supe la noticia ayer.',en:'I found out the news yesterday.'},{es:'Sabrás la respuesta mañana.',en:'You will know the answer tomorrow.'}]},
+  {es:'gustar',en:'to like (to please)',type:'special construction',tip:'Works backwards! The subject is the thing liked. "Me gusta el café" = Coffee pleases me = I like coffee. Use "gusta" (singular) or "gustan" (plural).',
+   present:{forms:[{p:'me',f:'gusta / gustan'},{p:'te',f:'gusta / gustan'},{p:'le',f:'gusta / gustan'},{p:'nos',f:'gusta / gustan'},{p:'os',f:'gusta / gustan'},{p:'les',f:'gusta / gustan'}],note:'"Me gusta" = I like (singular thing). "Me gustan" = I like (plural things). "Me encanta" = I love!'},
+   past:{forms:[{p:'me',f:'gustó / gustaron'},{p:'te',f:'gustó / gustaron'},{p:'le',f:'gustó / gustaron'},{p:'nos',f:'gustó / gustaron'},{p:'os',f:'gustó / gustaron'},{p:'les',f:'gustó / gustaron'}],note:'"Me gustó" = I liked it (singular). "Me gustaron" = I liked them (plural).'},
+   future:{forms:[{p:'me',f:'gustará / gustarán'},{p:'te',f:'gustará / gustarán'},{p:'le',f:'gustará / gustarán'},{p:'nos',f:'gustará / gustarán'},{p:'os',f:'gustará / gustarán'},{p:'les',f:'gustará / gustarán'}],note:'Future: "Te gustará España" = You will like Spain.'},
+   examples:[{es:'Me gustó mucho la cena.',en:'I really liked the dinner.'},{es:'Te gustará España.',en:'You will like Spain.'}]},
+];
+const sentences=[
+  {es:'Hola, me llamo [tu nombre].',en:'Hello, my name is [your name].',cat:'Greetings',icon:'👋'},
+  {es:'¿Cómo te llamas?',en:'What is your name?',cat:'Greetings',icon:'👋'},
+  {es:'Encantado/encantada de conocerte.',en:'Pleased to meet you.',cat:'Greetings',icon:'👋'},
+  {es:'¿Cómo estás?',en:'How are you?',cat:'Greetings',icon:'👋'},
+  {es:'Muy bien, gracias.',en:'Very well, thank you.',cat:'Greetings',icon:'👋'},
+  {es:'No hablo muy bien español.',en:'I do not speak Spanish very well.',cat:'Greetings',icon:'👋'},
+  {es:'¿Hablas inglés?',en:'Do you speak English?',cat:'Greetings',icon:'👋'},
+  {es:'¿Puedes hablar más despacio?',en:'Can you speak more slowly?',cat:'Greetings',icon:'👋'},
+  {es:'¿Puedes repetir, por favor?',en:'Can you repeat, please?',cat:'Greetings',icon:'👋'},
+  {es:'Una mesa para dos, por favor.',en:'A table for two, please.',cat:'Dining',icon:'🍽️'},
+  {es:'La carta, por favor.',en:'The menu, please.',cat:'Dining',icon:'🍽️'},
+  {es:'¿Qué recomienda?',en:'What do you recommend?',cat:'Dining',icon:'🍽️'},
+  {es:'La cuenta, por favor.',en:'The bill, please.',cat:'Dining',icon:'🍽️'},
+  {es:'Estaba delicioso, gracias.',en:'It was delicious, thank you.',cat:'Dining',icon:'🍽️'},
+  {es:'Soy alérgico a los frutos secos.',en:'I am allergic to nuts.',cat:'Dining',icon:'🍽️'},
+  {es:'Soy vegetariano/vegetariana.',en:'I am vegetarian.',cat:'Dining',icon:'🍽️'},
+  {es:'¿Cuánto cuesta?',en:'How much does it cost?',cat:'Shopping',icon:'🛍️'},
+  {es:'Es demasiado caro.',en:'It is too expensive.',cat:'Shopping',icon:'🛍️'},
+  {es:'¿Tiene una talla más grande?',en:'Do you have a larger size?',cat:'Shopping',icon:'🛍️'},
+  {es:'¿Aceptan tarjeta de crédito?',en:'Do you accept credit cards?',cat:'Shopping',icon:'🛍️'},
+  {es:'¿Dónde está el metro?',en:'Where is the metro?',cat:'Directions',icon:'🗺️'},
+  {es:'¿Está lejos de aquí?',en:'Is it far from here?',cat:'Directions',icon:'🗺️'},
+  {es:'Gire a la izquierda / a la derecha.',en:'Turn left / right.',cat:'Directions',icon:'🗺️'},
+  {es:'Siga todo recto.',en:'Go straight ahead.',cat:'Directions',icon:'🗺️'},
+  {es:'Estoy perdido/perdida.',en:'I am lost.',cat:'Directions',icon:'🗺️'},
+  {es:'¡Socorro!',en:'Help!',cat:'Emergencies',icon:'🆘'},
+  {es:'Llame a la policía, por favor.',en:'Please call the police.',cat:'Emergencies',icon:'🆘'},
+  {es:'Necesito un médico.',en:'I need a doctor.',cat:'Emergencies',icon:'🆘'},
+  {es:'He perdido mi pasaporte.',en:'I have lost my passport.',cat:'Emergencies',icon:'🆘'},
+  {es:'¿Dónde está el hospital más cercano?',en:'Where is the nearest hospital?',cat:'Emergencies',icon:'🆘'},
+  {es:'¡Felicidades!',en:'Congratulations!',cat:'Social',icon:'💬'},
+  {es:'¡Buena suerte!',en:'Good luck!',cat:'Social',icon:'💬'},
+  {es:'Soy de Londres.',en:'I am from London.',cat:'Social',icon:'💬'},
+  {es:'¡Que aproveche!',en:'Enjoy your meal!',cat:'Social',icon:'💬'},
+  {es:'Quiero reservar un billete.',en:'I would like to book a ticket.',cat:'Travel',icon:'✈️'},
+  {es:'¿A qué hora sale el próximo tren?',en:'What time does the next train leave?',cat:'Travel',icon:'✈️'},
+  {es:'Mi vuelo ha sido cancelado.',en:'My flight has been cancelled.',cat:'Travel',icon:'✈️'},
+  {es:'¿Dónde puedo coger un taxi?',en:'Where can I get a taxi?',cat:'Travel',icon:'✈️'},
+  {es:'Necesito un médico.',en:'I need a doctor.',cat:'Health',icon:'🏥'},
+  {es:'Tengo dolor de cabeza.',en:'I have a headache.',cat:'Health',icon:'🏥'},
+  {es:'Tengo fiebre.',en:'I have a fever.',cat:'Health',icon:'🏥'},
+  {es:'¿Dónde está la farmacia más cercana?',en:'Where is the nearest pharmacy?',cat:'Health',icon:'🏥'},
+];
+
+const STORAGE_KEY='es_v1';
+const STREAK_KEY='es_streak_v1';
+const ACH_KEY='es_ach_v1';
+const DAILY_KEY='es_daily_v1';
+
+let currentIndex=0;
+let filteredWords=[...words];
+let srsMode=false;
+let mastery={};
+let srs={};
+let quizCorrect=0,quizWrong=0,quizAnswered=false,quizCard=null;
+let listenCorrect=0,listenWrong=0,listenStreak=0,listenCard=null,listenAnswered=false;
+let currentSentenceFilter='all';
+let currentVerbIndex=0;
+let sentCardWords=[],sentCardIndex=0;
+let dailyWords=[],dailySelIndex=0,dailyStudyIndex=0,dailyKnownCount=0,dailyCandidates=[];
+let streakDays=0;
+let achievements={};
+
+const achList=[
+  {id:'first',icon:'🌟',title:'First Steps',desc:'Flip your first card'},
+  {id:'ten',icon:'🔟',title:'Ten Words',desc:'Learn 10 words'},
+  {id:'fifty',icon:'5️⃣0️⃣',title:'Fifty Words',desc:'Learn 50 words'},
+  {id:'century',icon:'💯',title:'Century',desc:'Learn 100 words'},
+  {id:'halfway',icon:'🏃',title:'Halfway There',desc:'Learn 200 words'},
+  {id:'master',icon:'🎓',title:'Vocabulary Master',desc:'Learn all 400 words'},
+  {id:'streak3',icon:'🔥',title:'On Fire',desc:'3-day streak'},
+  {id:'streak7',icon:'⚡',title:'Lightning',desc:'7-day streak'},
+  {id:'streak30',icon:'🏆',title:'Unstoppable',desc:'30-day streak'},
+  {id:'quiz10',icon:'🎯',title:'Sharp Shooter',desc:'Get 10 quiz answers right'},
+  {id:'quiz50',icon:'🏹',title:'Quiz Expert',desc:'Get 50 quiz answers right'},
+  {id:'listen10',icon:'👂',title:'Good Ear',desc:'Get 10 listen answers right'},
+  {id:'perfectquiz',icon:'✨',title:'Perfect Score',desc:'Quiz 90% accuracy (min 20)'},
+  {id:'daily1',icon:'📅',title:'Daily Habit',desc:'Complete Daily 10 once'},
+  {id:'daily7',icon:'📆',title:'Weekly Warrior',desc:'Complete Daily 10 seven times'},
+  {id:'verb',icon:'📝',title:'Verb Explorer',desc:'Visit the Verbs tab'},
+  {id:'hola',icon:'🇪🇸',title:'¡Hola España!',desc:'Start learning Spanish'},
+  {id:'early',icon:'🌅',title:'Early Bird',desc:'Use the app before 8am'},
+  {id:'night',icon:'🌙',title:'Night Owl',desc:'Use the app after 10pm'},
+  {id:'sentences',icon:'💬',title:'Sentence Builder',desc:'Study 20 sentence cards'},
+  {id:'listen_streak5',icon:'🎵',title:'Music to My Ears',desc:'5 correct listen answers in a row'},
+  {id:'collector',icon:'🗝️',title:'Word Collector',desc:'Reach 50 mastered words'},
+  {id:'linguavita',icon:'✦',title:'Linguavita',desc:'Open the app 10 times'},
+];
+
+function today(){var d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function getNextReview(grade){var d=new Date();if(grade===0)return today();if(grade===1)d.setDate(d.getDate()+1);else if(grade===2)d.setDate(d.getDate()+3);else d.setDate(d.getDate()+7);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function isDue(srsData){if(!srsData||!srsData.nextReview)return false;return srsData.nextReview<=today();}
+function formatNextReview(dateStr){if(!dateStr)return '';if(dateStr===today())return 'Today';var d=new Date(dateStr),t=new Date();t.setHours(0,0,0,0);var diff=Math.round((d-t)/(1000*60*60*24));if(diff===1)return 'Tomorrow';return 'In '+diff+' days';}
+
+function loadProgress(){
+  try{var s=localStorage.getItem(STORAGE_KEY);if(s){var p=JSON.parse(s);mastery=p.mastery||{};srs=p.srs||{};quizCorrect=p.qc||0;quizWrong=p.qw||0;listenCorrect=p.lc||0;listenWrong=p.lw||0;}}catch(e){}
+  try{var sk=localStorage.getItem(STREAK_KEY);if(sk){var sp=JSON.parse(sk);streakDays=sp.days||0;}}catch(e){}
+  try{var ak=localStorage.getItem(ACH_KEY);if(ak){achievements=JSON.parse(ak)||{};}}catch(e){}
+  words.forEach(function(w){if(mastery[w.es]===undefined)mastery[w.es]=0;});
+}
+function saveProgress(){
+  try{localStorage.setItem(STORAGE_KEY,JSON.stringify({mastery:mastery,srs:srs,qc:quizCorrect,qw:quizWrong,lc:listenCorrect,lw:listenWrong}));localStorage.setItem(ACH_KEY,JSON.stringify(achievements));}catch(e){}
+  var ind=document.getElementById('saveIndicator');
+  ind.classList.add('show');setTimeout(function(){ind.classList.remove('show');},1500);
+}
+
+function recordFlip(){
+  var t=today();
+  var key=STORAGE_KEY+'_flip_'+t;
+  try{
+    var count=parseInt(localStorage.getItem(key)||'0')+1;
+    localStorage.setItem(key,String(count));
+    if(count>=5){
+      var sk=localStorage.getItem(STREAK_KEY);
+      var sp=sk?JSON.parse(sk):{days:0,last:''};
+      if(sp.last!==t){
+        var yesterday=new Date();yesterday.setDate(yesterday.getDate()-1);
+        var yd=yesterday.getFullYear()+'-'+String(yesterday.getMonth()+1).padStart(2,'0')+'-'+String(yesterday.getDate()).padStart(2,'0');
+        sp.days=sp.last===yd?sp.days+1:1;
+        sp.last=t;
+        streakDays=sp.days;
+        localStorage.setItem(STREAK_KEY,JSON.stringify(sp));
+        updateStreakUI();
+      }
+    }
+    var h=new Date().getHours();
+    if(h<8)earnAchievement('early');
+    if(h>=22)earnAchievement('night');
+  }catch(e){}
+}
+
+function updateStats(){
+  var mastered=Object.values(mastery).filter(function(v){return v>=2;}).length;
+  var learning=Object.values(mastery).filter(function(v){return v===1;}).length;
+  var due=words.filter(function(w){return isDue(srs[w.es]);}).length;
+  var qTotal=quizCorrect+quizWrong;
+  var qPct=qTotal>0?Math.round(quizCorrect/qTotal*100):0;
+  var lTotal=listenCorrect+listenWrong;
+  var lPct=lTotal>0?Math.round(listenCorrect/lTotal*100):0;
+  var pct=Math.round(mastered/words.length*100);
+  document.getElementById('progressBar').style.width=pct+'%';
+  document.getElementById('progressPct').textContent=pct+'%';
+  document.getElementById('statMastered').textContent=mastered;
+  document.getElementById('statLearning').textContent=learning;
+  document.getElementById('statDue').textContent=due;
+  document.getElementById('statQuizScore').textContent=qPct+'%';
+  document.getElementById('statListenScore').textContent=lPct+'%';
+  document.getElementById('pMastered').textContent=mastered;
+  document.getElementById('pLearning').textContent=learning;
+  document.getElementById('pDue').textContent=due;
+  document.getElementById('pAccuracy').textContent=qTotal>0?qPct+'%':'—';
+  document.getElementById('pListenAcc').textContent=lTotal>0?lPct+'%':'—';
+  document.getElementById('pStreak').textContent=streakDays;
+  document.getElementById('qCorrect').textContent=quizCorrect;
+  document.getElementById('qWrong').textContent=quizWrong;
+  document.getElementById('qTotal').textContent=qTotal;
+  document.getElementById('lCorrect').textContent=listenCorrect;
+  document.getElementById('lWrong').textContent=listenWrong;
+  document.getElementById('lStreak').textContent=listenStreak;
+  checkAchievements();
+}
+
+function updateStreakUI(){
+  document.getElementById('streakCount').textContent=streakDays;
+  document.getElementById('streakBadge').classList.toggle('active',streakDays>0);
+  document.getElementById('pStreak').textContent=streakDays;
+  var mastered=Object.values(mastery).filter(function(v){return v>=2;}).length;
+  var qTotal=quizCorrect+quizWrong;
+  var msg='';
+  if(streakDays>=2)msg='🔥 '+streakDays+' days in a row!';
+  else if(mastered>0)msg='⭐ '+mastered+' words mastered';
+  else if(qTotal>0)msg='🎯 '+quizCorrect+' quiz correct';
+  document.getElementById('streakToday').textContent=msg;
+  buildStreakHistory();
+}
+
+function buildStreakHistory(){
+  var el=document.getElementById('streakHistory');
+  if(!el)return;
+  el.innerHTML='';
+  for(var i=13;i>=0;i--){
+    var d=new Date();d.setDate(d.getDate()-i);
+    var ds=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    var div=document.createElement('div');
+    div.className='streak-day';
+    var key=STORAGE_KEY+'_flip_'+ds;
+    var count=0;try{count=parseInt(localStorage.getItem(key)||'0');}catch(e){}
+    if(count>=5)div.classList.add('done');
+    if(i===0)div.classList.add('today');
+    div.title=ds+(count>=5?' ✓':'');
+    el.appendChild(div);
+  }
+}
+
+function checkAchievements(){
+  var mastered=Object.values(mastery).filter(function(v){return v>=2;}).length;
+  var learning=Object.values(mastery).filter(function(v){return v>=1;}).length;
+  var qTotal=quizCorrect+quizWrong;
+  var qPct=qTotal>0?Math.round(quizCorrect/qTotal*100):0;
+  var dailyCount=0;try{dailyCount=parseInt(localStorage.getItem('es_daily_count')||'0');}catch(e){}
+  var openCount=0;try{openCount=parseInt(localStorage.getItem('es_open_count')||'0');}catch(e){}
+  if(learning>=1)earnAchievement('hola');
+  if(learning>=1)earnAchievement('first');
+  if(mastered>=10)earnAchievement('ten');
+  if(mastered>=50){earnAchievement('fifty');earnAchievement('collector');}
+  if(mastered>=100)earnAchievement('century');
+  if(mastered>=200)earnAchievement('halfway');
+  if(mastered>=400)earnAchievement('master');
+  if(streakDays>=3)earnAchievement('streak3');
+  if(streakDays>=7)earnAchievement('streak7');
+  if(streakDays>=30)earnAchievement('streak30');
+  if(quizCorrect>=10)earnAchievement('quiz10');
+  if(quizCorrect>=50)earnAchievement('quiz50');
+  if(listenCorrect>=10)earnAchievement('listen10');
+  if(qTotal>=20&&qPct>=90)earnAchievement('perfectquiz');
+  if(listenStreak>=5)earnAchievement('listen_streak5');
+  if(dailyCount>=1)earnAchievement('daily1');
+  if(dailyCount>=7)earnAchievement('daily7');
+  if(openCount>=10)earnAchievement('linguavita');
+  updateTrophyCabinet();
+}
+
+function earnAchievement(id){
+  if(achievements[id])return;
+  achievements[id]=today();
+  saveProgress();
+  var ach=achList.find(function(a){return a.id===id;});
+  if(ach)showAchievementPopup(ach);
+}
+
+function showAchievementPopup(ach){
+  document.getElementById('popupIcon').textContent=ach.icon;
+  document.getElementById('popupName').textContent=ach.title;
+  document.getElementById('popupDesc').textContent=ach.desc;
+  document.getElementById('achievementPopup').classList.add('show');
+  document.getElementById('popupOverlay').classList.add('show');
+  launchConfetti();
+}
+
+function closePopup(){
+  document.getElementById('achievementPopup').classList.remove('show');
+  document.getElementById('popupOverlay').classList.remove('show');
+}
+
+function launchConfetti(){
+  var colors=['#C9A84C','#8B1A1A','#6B7F5A','#E8D5A0','#ffffff'];
+  for(var i=0;i<40;i++){
+    (function(i){
+      setTimeout(function(){
+        var el=document.createElement('div');
+        el.className='confetti-piece';
+        el.style.left=Math.random()*100+'vw';
+        el.style.background=colors[Math.floor(Math.random()*colors.length)];
+        el.style.animationDuration=(1.5+Math.random()*1.5)+'s';
+        el.style.width=el.style.height=(6+Math.random()*6)+'px';
+        document.body.appendChild(el);
+        setTimeout(function(){el.remove();},3000);
+      },i*50);
+    })(i);
+  }
+}
+
+function updateTrophyCabinet(){
+  var el=document.getElementById('trophyCabinet');
+  if(!el)return;
+  el.innerHTML='';
+  achList.forEach(function(ach){
+    var div=document.createElement('div');
+    var earned=achievements[ach.id];
+    div.className='trophy '+(earned?'earned':'locked');
+    div.innerHTML='<span class="trophy-icon">'+ach.icon+'</span><div class="trophy-title">'+ach.title+'</div><div class="trophy-desc">'+ach.desc+'</div>'+(earned?'<span class="trophy-earned-label">✦ Earned</span>':'');
+    el.appendChild(div);
+  });
+}
+
+function showTab(name,btn){
+  document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});
+  document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active');});
+  document.getElementById('panel-'+name).classList.add('active');
+  if(btn)btn.classList.add('active');
+  if(name==='verbs'){renderVerbSelector();renderVerbCard();}
+  if(name==='sentences')renderSentences();
+  if(name==='quiz')loadQuizQuestion();
+  if(name==='listen')loadListenQuestion();
+  if(name==='progress'){updateMasteryList();updateTrophyCabinet();buildStreakHistory();}
+  if(name==='daily')loadDailyTab();
+  if(name==='sentcards'){initSentCards();renderSentCard();}
+  if(name==='verbs')earnAchievement('verb');
+}
+
+// FLASHCARDS
+function renderCard(){
+  if(filteredWords.length===0)return;
+  var card=filteredWords[currentIndex];
+  document.getElementById('flashcard').classList.remove('flipped');
+  document.getElementById('fcCategory').textContent=card.cat;
+  document.getElementById('fcCategoryBack').textContent=card.cat;
+  document.getElementById('fcSpanish').textContent=card.es;
+  document.getElementById('fcEnglish').textContent=card.en;
+  document.getElementById('fcPronunciation').textContent=card.ipa;
+  document.getElementById('fcPronunciationBack').textContent=card.ipa;
+  document.getElementById('fcExample').textContent=card.ex;
+  document.getElementById('fcExampleEn').textContent=card.exEn;
+  var tipEl=document.getElementById('fcGrammarTip');
+  if(card.tip){tipEl.style.display='block';document.getElementById('fcGrammarText').textContent=card.tip;}
+  else{tipEl.style.display='none';}
+  var srsEl=document.getElementById('fcSrsInfo');
+  var srsData=srs[card.es];
+  srsEl.textContent=srsData&&srsData.nextReview?'Next: '+formatNextReview(srsData.nextReview):'';
+  document.getElementById('fcCounter').textContent='Card '+(currentIndex+1)+' of '+filteredWords.length;
+}
+
+function flipCard(){
+  var card=filteredWords[currentIndex];
+  document.getElementById('flashcard').classList.toggle('flipped');
+  if(mastery[card.es]===0){mastery[card.es]=1;saveProgress();updateStats();}
+  recordFlip();
+  earnAchievement('first');
+}
+
+function nextCard(){currentIndex=(currentIndex+1)%filteredWords.length;renderCard();}
+function prevCard(){currentIndex=(currentIndex-1+filteredWords.length)%filteredWords.length;renderCard();}
+function shuffleCards(){filteredWords=filteredWords.sort(function(){return Math.random()-0.5;});currentIndex=0;renderCard();}
+
+function markCard(grade){
+  var card=filteredWords[currentIndex];
+  if(grade===0)mastery[card.es]=Math.max(0,mastery[card.es]);
+  else if(grade>=2)mastery[card.es]=Math.min(2,mastery[card.es]+1);
+  else mastery[card.es]=Math.max(1,mastery[card.es]);
+  srs[card.es]={nextReview:getNextReview(grade),lastGrade:grade,lastReviewed:today()};
+  saveProgress();updateStats();nextCard();
+}
+
+function filterCategory(){
+  var val=document.getElementById('categorySelect').value;
+  filteredWords=val==='all'?[...words]:words.filter(function(w){return w.cat===val;});
+  currentIndex=0;
+  document.getElementById('srsModeBar').style.display='none';
+  srsMode=false;
+  renderCard();
+}
+
+function startSrsMode(){
+  var due=words.filter(function(w){return isDue(srs[w.es]);});
+  if(due.length===0){alert('No cards due for review right now!');return;}
+  filteredWords=due;currentIndex=0;srsMode=true;
+  document.getElementById('srsModeBar').style.display='flex';
+  document.getElementById('srsDueCount').textContent=due.length;
+  renderCard();
+}
+
+function exitSrsMode(){
+  srsMode=false;
+  document.getElementById('srsModeBar').style.display='none';
+  filteredWords=[...words];currentIndex=0;renderCard();
+}
+
+function speakWord(){
+  var card=filteredWords[currentIndex];if(!card)return;
+  var u=new SpeechSynthesisUtterance(card.es);u.lang='es-ES';u.rate=0.85;speechSynthesis.speak(u);
+}
+
+// SENTENCE CARDS
+function initSentCards(){sentCardWords=[...words].filter(function(w){return w.ex&&w.ex.length>0;});}
+function filterSentCards(){
+  var val=document.getElementById('sentCardCatSelect').value;
+  sentCardWords=words.filter(function(w){return w.ex&&w.ex.length>0&&(val==='all'||w.cat===val);});
+  sentCardIndex=0;renderSentCard();
+}
+function makeBlankedSentence(sentence,word){
+  var blank='<span class="sentcard-blank">'+' '.repeat(Math.max(6,word.length+2))+'</span>';
+  var escaped=word.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+  var rx=new RegExp('(^|[\\s,;:!?])('+escaped+')([\\s,;:!?]|$)','i');
+  var result=sentence;var matched=false;
+  if(rx.test(sentence)){result=sentence.replace(rx,function(m,pre,w,post){return pre+blank+post;});matched=true;}
+  var visibleText=result.replace(/<[^>]+>/g,'').trim();
+  var visibleWords=visibleText.split(/\s+/).filter(function(w){return w.length>0;});
+  if(matched&&visibleWords.length>=2){return {html:result,hasContext:true};}
+  var rx2=new RegExp('('+escaped+')','i');
+  if(rx2.test(sentence)){
+    var result2=sentence.replace(rx2,blank);
+    var visible2=result2.replace(/<[^>]+>/g,'').trim();
+    var words2=visible2.split(/\s+/).filter(function(w){return w.length>0;});
+    if(words2.length>=2)return {html:result2,hasContext:true};
+  }
+  return {html:sentence,hasContext:false};
+}
+function renderSentCard(){
+  if(sentCardWords.length===0)return;
+  var card=sentCardWords[sentCardIndex];
+  document.getElementById('sentFlashcard').classList.remove('flipped');
+  document.getElementById('sentFcCategory').textContent=card.cat;
+  document.getElementById('sentFcCategoryBack').textContent=card.cat;
+  var blanked=makeBlankedSentence(card.ex,card.es);
+  var frontSentEl=document.getElementById('sentFcSentence');
+  var promptEl=document.querySelector('.sentcard-prompt');
+  if(blanked.hasContext){frontSentEl.innerHTML=blanked.html;promptEl.textContent='What is the missing word?';}
+  else{frontSentEl.innerHTML='<span style="color:var(--text-light);font-style:italic;font-size:1rem;">'+card.exEn+'</span><br><br>'+card.ex;promptEl.textContent='How do you say the underlined word in Spanish?';}
+  document.getElementById('sentFcWord').textContent=card.es;
+  document.getElementById('sentFcSentenceFull').textContent=card.ex;
+  document.getElementById('sentFcTranslation').textContent=card.exEn;
+  var tipEl=document.getElementById('sentFcTip');
+  if(card.tip){tipEl.style.display='block';document.getElementById('sentFcTipText').textContent=card.tip;}
+  else{tipEl.style.display='none';}
+  document.getElementById('sentCardCounter').textContent='Card '+(sentCardIndex+1)+' of '+sentCardWords.length;
+}
+function flipSentCard(){
+  document.getElementById('sentFlashcard').classList.toggle('flipped');
+  var card=sentCardWords[sentCardIndex];
+  if(mastery[card.es]===0){mastery[card.es]=1;saveProgress();updateStats();}
+  earnAchievement('sentences');
+}
+function nextSentCard(){sentCardIndex=(sentCardIndex+1)%sentCardWords.length;renderSentCard();}
+function prevSentCard(){sentCardIndex=(sentCardIndex-1+sentCardWords.length)%sentCardWords.length;renderSentCard();}
+function shuffleSentCards(){sentCardWords=sentCardWords.sort(function(){return Math.random()-0.5;});sentCardIndex=0;renderSentCard();}
+function markSentCard(grade){
+  var card=sentCardWords[sentCardIndex];
+  if(grade===0)mastery[card.es]=Math.max(0,mastery[card.es]);
+  else if(grade>=2)mastery[card.es]=Math.min(2,mastery[card.es]+1);
+  else mastery[card.es]=Math.max(1,mastery[card.es]);
+  srs[card.es]={nextReview:getNextReview(grade),lastGrade:grade,lastReviewed:today()};
+  saveProgress();updateStats();nextSentCard();
+}
+function speakSentCardBlank(){var card=sentCardWords[sentCardIndex];if(!card)return;var u=new SpeechSynthesisUtterance(card.ex);u.lang='es-ES';u.rate=0.82;speechSynthesis.speak(u);}
+function speakSentCardFull(){var card=sentCardWords[sentCardIndex];if(!card)return;var u=new SpeechSynthesisUtterance(card.ex);u.lang='es-ES';u.rate=0.82;speechSynthesis.speak(u);}
+
+// LISTEN
+function loadListenQuestion(){
+  listenAnswered=false;
+  document.getElementById('listenFeedback').textContent='';
+  document.getElementById('listenFeedback').className='listen-feedback';
+  document.getElementById('nextListenBtn').style.display='none';
+  document.getElementById('listenWordReveal').style.display='none';
+  document.getElementById('listenPlayBtn').classList.remove('playing');
+  listenCard=words[Math.floor(Math.random()*words.length)];
+  var wrong=words.filter(function(w){return w.es!==listenCard.es;}).sort(function(){return Math.random()-0.5;}).slice(0,3);
+  var opts=[listenCard].concat(wrong).sort(function(){return Math.random()-0.5;});
+  var container=document.getElementById('listenOptions');
+  container.innerHTML='';
+  for(var i=0;i<opts.length;i++){
+    (function(opt){
+      var btn=document.createElement('button');
+      btn.className='listen-option';
+      btn.textContent=opt.en;
+      var isCorrect=opt.es===listenCard.es;
+      btn.addEventListener('click',function(){checkListenAnswer(btn,isCorrect,opt.es);});
+      container.appendChild(btn);
+    })(opts[i]);
+  }
+  var round=listenCorrect+listenWrong+1;
+  document.getElementById('listenRoundLabel').textContent='Round '+round;
+  setTimeout(function(){playListenWord();},400);
+}
+function playListenWord(){
+  if(!listenCard)return;
+  var btn=document.getElementById('listenPlayBtn');
+  btn.classList.add('playing');
+  var u=new SpeechSynthesisUtterance(listenCard.es);u.lang='es-ES';u.rate=0.75;
+  u.onend=function(){btn.classList.remove('playing');};
+  speechSynthesis.speak(u);
+}
+function checkListenAnswer(btn,isCorrect,wordEs){
+  if(listenAnswered)return;
+  listenAnswered=true;
+  var opts=document.querySelectorAll('.listen-option');
+  opts.forEach(function(b){b.disabled=true;if(b.textContent===listenCard.en)b.classList.add('correct');});
+  if(isCorrect){
+    listenCorrect++;listenStreak++;
+    document.getElementById('listenFeedback').textContent='✓ Correct! '+listenCard.es+' = '+listenCard.en;
+    document.getElementById('listenFeedback').className='listen-feedback correct';
+    mastery[listenCard.es]=Math.min(2,mastery[listenCard.es]+1);
+    srs[listenCard.es]={nextReview:getNextReview(2),lastGrade:2,lastReviewed:today()};
+  } else {
+    btn.classList.add('wrong');
+    listenWrong++;listenStreak=0;
+    document.getElementById('listenFeedback').textContent='✗ '+listenCard.en+' — Listen again!';
+    document.getElementById('listenFeedback').className='listen-feedback wrong';
+  }
+  document.getElementById('listenWordReveal').textContent=listenCard.es;
+  document.getElementById('listenWordReveal').style.display='block';
+  document.getElementById('nextListenBtn').style.display='inline-flex';
+  saveProgress();updateStats();recordFlip();
+}
+function resetListen(){listenCorrect=0;listenWrong=0;listenStreak=0;saveProgress();updateStats();loadListenQuestion();}
+
+// SENTENCES/PHRASES
+function renderSentences(){
+  var filtered=currentSentenceFilter==='all'?sentences:sentences.filter(function(s){return s.cat===currentSentenceFilter;});
+  var grid=document.getElementById('sentencesGrid');
+  grid.innerHTML='';
+  for(var i=0;i<filtered.length;i++){
+    var s=filtered[i];
+    var card=document.createElement('div');card.className='sentence-card';
+    var icon=document.createElement('div');icon.className='sentence-icon';icon.textContent=s.icon;
+    var body=document.createElement('div');body.className='sentence-content';
+    body.innerHTML='<div class="sentence-situation">'+s.cat+'</div><div class="sentence-es">'+s.es+'</div><div class="sentence-en">'+s.en+'</div>';
+    var audioBtn=document.createElement('button');audioBtn.className='sentence-audio';audioBtn.textContent='🔊';
+    (function(text){audioBtn.addEventListener('click',function(){speakSentence(text);});})(s.es);
+    card.appendChild(icon);card.appendChild(body);card.appendChild(audioBtn);
+    grid.appendChild(card);
+  }
+}
+function filterSentences(cat,btn){
+  currentSentenceFilter=cat;
+  document.querySelectorAll('.filter-chip').forEach(function(b){b.classList.remove('active');});
+  if(btn)btn.classList.add('active');
+  renderSentences();
+}
+function speakSentence(text){var u=new SpeechSynthesisUtterance(text);u.lang='es-ES';u.rate=0.82;speechSynthesis.speak(u);}
+
+// VERBS
+function renderVerbSelector(){
+  var sel=document.getElementById('verbSelector');
+  sel.innerHTML='';
+  verbs.forEach(function(v,i){
+    var btn=document.createElement('button');
+    btn.className='verb-chip'+(i===currentVerbIndex?' active':'');
+    btn.textContent=v.es;
+    (function(idx){btn.addEventListener('click',function(){selectVerb(idx);});})(i);
+    sel.appendChild(btn);
+  });
+}
+function selectVerb(idx){
+  currentVerbIndex=idx;
+  document.querySelectorAll('.verb-chip').forEach(function(b,i){b.classList.toggle('active',i===idx);});
+  renderVerbCard();
+}
+function renderVerbCard(){
+  var v=verbs[currentVerbIndex];
+  var prevIdx=(currentVerbIndex-1+verbs.length)%verbs.length;
+  var nextIdx=(currentVerbIndex+1)%verbs.length;
+  function makeTensePanel(tenseKey){
+    var t=v[tenseKey];var rows='';
+    for(var i=0;i<t.forms.length;i++){
+      var f=t.forms[i];
+      var safeForm=f.f.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+      rows+='<div class="conj-cell"><span class="conj-pronoun">'+f.p+'</span><span class="conj-form">'+f.f+'</span><button class="conj-audio" data-conj="'+safeForm+'" onclick="speakConjSafe(this)">🔊</button></div>';
+    }
+    return '<div class="tense-panel" id="tense-'+tenseKey+'" style="display:none;"><div class="conj-grid">'+rows+'</div><div class="tense-note">'+t.note+'</div></div>';
+  }
+  var examples='';
+  for(var j=0;j<v.examples.length;j++){
+    examples+='<div class="verb-example"><div class="verb-example-es">'+v.examples[j].es+'</div><div class="verb-example-en">'+v.examples[j].en+'</div></div>';
+  }
+  var html='<div class="verb-card">';
+  html+='<div class="verb-header"><div><span class="verb-title">'+v.es+'</span>&nbsp;<span class="verb-meaning">'+v.en+'</span></div><span class="verb-type">'+v.type+'</span></div>';
+  html+='<div class="verb-tip">💡 '+v.tip+'</div>';
+  html+='<div class="tense-tabs">';
+  html+='<button class="tense-tab active" onclick="showTense(\'present\',this)">Present<span class="tense-label">yo hablo</span></button>';
+  html+='<button class="tense-tab" onclick="showTense(\'past\',this)">Past<span class="tense-label">pas.</span></button>';
+  html+='<button class="tense-tab" onclick="showTense(\'future\',this)">Future<span class="tense-label">futur.</span></button>';
+  html+='</div>';
+  html+=makeTensePanel('present');
+  html+=makeTensePanel('past');
+  html+=makeTensePanel('future');
+  html+=examples+'</div>';
+  html+='<div style="display:flex;gap:0.5rem;justify-content:center;margin-top:0.5rem;">';
+  html+='<button class="btn btn-outline" onclick="selectVerb('+prevIdx+')">&#8592; Anterior</button>';
+  html+='<button class="btn btn-primary" onclick="selectVerb('+nextIdx+')">Siguiente &#8594;</button>';
+  html+='</div>';
+  document.getElementById('verbDisplay').innerHTML=html;
+  showTense('present',document.querySelectorAll('.tense-tab')[0]);
+}
+function showTense(tenseKey,btn){
+  document.querySelectorAll('.tense-panel').forEach(function(p){p.style.display='none';});
+  document.querySelectorAll('.tense-tab').forEach(function(b){b.classList.remove('active');});
+  var panel=document.getElementById('tense-'+tenseKey);
+  if(panel)panel.style.display='block';
+  if(btn)btn.classList.add('active');
+}
+function speakConj(form){var u=new SpeechSynthesisUtterance(form);u.lang='es-ES';u.rate=0.85;speechSynthesis.speak(u);}
+function speakConjSafe(btn){var form=btn.getAttribute('data-conj');if(form)speakConj(form);}
+
+// QUIZ
+function loadQuizQuestion(){
+  quizAnswered=false;
+  document.getElementById('quizFeedback').textContent='';
+  document.getElementById('quizFeedback').className='quiz-feedback';
+  document.getElementById('nextQuizBtn').style.display='none';
+  quizCard=words[Math.floor(Math.random()*words.length)];
+  var esToEn=Math.random()>0.4;
+  document.getElementById('quizLabel').textContent=esToEn?'What does this mean in English?':'How do you say this in Spanish?';
+  document.getElementById('quizWord').textContent=esToEn?quizCard.es:quizCard.en;
+  document.getElementById('quizType').textContent=esToEn?quizCard.ipa:quizCard.cat;
+  var wrong=words.filter(function(w){return w.es!==quizCard.es;}).sort(function(){return Math.random()-0.5;}).slice(0,3);
+  var options=[quizCard].concat(wrong).sort(function(){return Math.random()-0.5;});
+  var container=document.getElementById('quizOptions');
+  container.innerHTML='';
+  for(var i=0;i<options.length;i++){
+    (function(opt){
+      var btn=document.createElement('button');
+      btn.className='quiz-option';
+      btn.textContent=esToEn?opt.en:opt.es;
+      var isCorrect=opt.es===quizCard.es;
+      btn.addEventListener('click',function(){checkAnswer(btn,isCorrect,opt.es);});
+      container.appendChild(btn);
+    })(options[i]);
+  }
+}
+function checkAnswer(btn,isCorrect,wordEs){
+  if(quizAnswered)return;
+  quizAnswered=true;
+  document.querySelectorAll('.quiz-option').forEach(function(b){
+    b.disabled=true;
+    if(b.textContent===quizCard.en||b.textContent===quizCard.es)b.classList.add('correct');
+  });
+  if(isCorrect){
+    quizCorrect++;
+    document.getElementById('quizFeedback').textContent='✓ Correct! ¡Muy bien!';
+    document.getElementById('quizFeedback').className='quiz-feedback correct';
+    mastery[quizCard.es]=Math.min(2,mastery[quizCard.es]+1);
+    srs[quizCard.es]={nextReview:getNextReview(2),lastGrade:2,lastReviewed:today()};
+  } else {
+    btn.classList.add('wrong');
+    quizWrong++;
+    document.getElementById('quizFeedback').textContent='✗ '+quizCard.es+' = '+quizCard.en;
+    document.getElementById('quizFeedback').className='quiz-feedback wrong';
+  }
+  document.getElementById('nextQuizBtn').style.display='inline-flex';
+  saveProgress();updateStats();recordFlip();
+}
+function resetQuiz(){quizCorrect=0;quizWrong=0;saveProgress();updateStats();loadQuizQuestion();}
+
+// PROGRESS
+function updateMasteryList(){
+  var el=document.getElementById('masteryList');
+  if(!el)return;
+  el.innerHTML='';
+  var sorted=[...words].sort(function(a,b){return (mastery[b.es]||0)-(mastery[a.es]||0);});
+  sorted.forEach(function(w){
+    var div=document.createElement('div');
+    div.className='word-mastery-item';
+    var m=mastery[w.es]||0;
+    var srsData=srs[w.es];
+    var nextRev=srsData?srsData.nextReview:'';
+    var isdue=nextRev&&nextRev<=today();
+    div.innerHTML='<span>'+w.es+'</span><span>'+w.en+'</span><span><span class="mastery-dot mastery-'+m+'" title="Level '+m+'"></span></span><span class="next-review'+(isdue?' due':'')+'">'+formatNextReview(nextRev)+'</span>';
+    el.appendChild(div);
+  });
+}
+function confirmReset(){if(confirm('Reset all Spanish progress?')){mastery={};srs={};quizCorrect=0;quizWrong=0;listenCorrect=0;listenWrong=0;achievements={};words.forEach(function(w){mastery[w.es]=0;});saveProgress();updateStats();updateMasteryList();alert('Progress reset.');}}
+function exportProgress(){
+  var data={mastery:mastery,srs:srs,qc:quizCorrect,qw:quizWrong,lc:listenCorrect,lw:listenWrong,exported:today()};
+  var blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');a.href=url;a.download='linguavita-spanish-backup-'+today()+'.json';a.click();
+  URL.revokeObjectURL(url);
+  document.getElementById('backupMsg').textContent='Backup downloaded ✓';
+}
+function importProgress(event){
+  var file=event.target.files[0];if(!file)return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      var data=JSON.parse(e.target.result);
+      if(data.mastery){mastery=data.mastery;srs=data.srs||{};quizCorrect=data.qc||0;quizWrong=data.qw||0;listenCorrect=data.lc||0;listenWrong=data.lw||0;saveProgress();updateStats();updateMasteryList();document.getElementById('backupMsg').textContent='Backup restored ✓';}
+    }catch(err){document.getElementById('backupMsg').textContent='Invalid backup file.';}
+  };
+  reader.readAsText(file);
+}
+
+// DAILY 10
+function getDailyCandidates(){
+  var due=words.filter(function(w){return isDue(srs[w.es])&&mastery[w.es]>0;}).sort(function(a,b){return ((srs[a.es]&&srs[a.es].nextReview)||'').localeCompare((srs[b.es]&&srs[b.es].nextReview)||'');});
+  var unseen=words.filter(function(w){return mastery[w.es]===0;}).sort(function(){return Math.random()-0.5;});
+  var weak=words.filter(function(w){return mastery[w.es]===1&&!isDue(srs[w.es]);}).sort(function(){return Math.random()-0.5;});
+  var seen={}; var result=[];
+  [due,unseen,weak].forEach(function(list){
+    list.forEach(function(w){if(!seen[w.es]&&result.length<50){seen[w.es]=true;result.push(w);}});
+  });
+  return result;
+}
+function loadDailyTab(){
+  var t=today(); var saved=null;
+  try{saved=JSON.parse(localStorage.getItem(DAILY_KEY));}catch(e){}
+  if(saved&&saved.date===t&&saved.words&&saved.words.length===10){
+    dailyWords=saved.words.map(function(es){return words.find(function(w){return w.es===es;});}).filter(Boolean);
+    if(dailyWords.length===10){startDailyStudy();return;}
+  }
+  dailyWords=[];dailyKnownCount=0;
+  dailyCandidates=getDailyCandidates();
+  dailySelIndex=0;
+  showDailySelectPhase();showNextCandidate();
+}
+function showDailySelectPhase(){
+  document.getElementById('dailySelectPhase').style.display='block';
+  document.getElementById('dailyStudyPhase').style.display='none';
+  document.getElementById('dailyComplete').style.display='none';
+}
+function showNextCandidate(){
+  updateDailyRing();
+  if(dailyWords.length>=10){saveDailyWords();startDailyStudy();return;}
+  if(dailySelIndex>=dailyCandidates.length){var remaining=words.filter(function(w){return dailyWords.indexOf(w)===-1;}).sort(function(){return Math.random()-0.5;});dailyCandidates=dailyCandidates.concat(remaining);}
+  var card=dailyCandidates[dailySelIndex];
+  if(!card){startDailyStudy();return;}
+  document.getElementById('dailySelLabel').textContent='Word '+(dailyWords.length+1)+' of 10 — '+(dailyKnownCount>0?dailyKnownCount+' skipped':'tap to decide');
+  document.getElementById('dailySelCategory').textContent=card.cat;
+  document.getElementById('dailySelWord').textContent=card.es;
+  document.getElementById('dailySelIpa').textContent=card.ipa;
+  document.getElementById('dailySelExample').textContent=card.ex;
+  document.getElementById('dailySelExampleEn').textContent=card.exEn;
+  document.getElementById('dailySelHint').textContent=mastery[card.es]===0?'New word':'Last reviewed: '+formatNextReview((srs[card.es]&&srs[card.es].nextReview)||'');
+  document.getElementById('dailySubtitle').textContent=dailyWords.length+' of 10 chosen · '+dailyKnownCount+' skipped';
+}
+function dailyKnowIt(){
+  var card=dailyCandidates[dailySelIndex];if(!card)return;
+  mastery[card.es]=Math.min(2,(mastery[card.es]||0)+1);
+  srs[card.es]={nextReview:getNextReview(3),lastGrade:3,lastReviewed:today()};
+  saveProgress();dailyKnownCount++;dailySelIndex++;showNextCandidate();
+}
+function dailyLearnIt(){
+  var card=dailyCandidates[dailySelIndex];if(!card)return;
+  dailyWords.push(card);dailySelIndex++;showNextCandidate();
+}
+function speakDailyWord(){var card=dailyCandidates[dailySelIndex];if(!card)return;var u=new SpeechSynthesisUtterance(card.es);u.lang='es-ES';u.rate=0.85;speechSynthesis.speak(u);}
+function saveDailyWords(){
+  var t=today();
+  try{localStorage.setItem(DAILY_KEY,JSON.stringify({date:t,words:dailyWords.map(function(w){return w.es;})}));}catch(e){}
+  try{var c=parseInt(localStorage.getItem('es_daily_count')||'0')+1;localStorage.setItem('es_daily_count',String(c));}catch(e){}
+  recordFlip();recordFlip();recordFlip();recordFlip();recordFlip();
+}
+function startDailyStudy(){
+  dailyStudyIndex=0;
+  document.getElementById('dailySelectPhase').style.display='none';
+  document.getElementById('dailyStudyPhase').style.display='block';
+  document.getElementById('dailyComplete').style.display='none';
+  renderDailyStudyCard();updateDailyRing();
+}
+function renderDailyStudyCard(){
+  if(dailyWords.length===0)return;
+  var card=dailyWords[dailyStudyIndex];
+  document.getElementById('dailyFlashcard').classList.remove('flipped');
+  document.getElementById('dailyFcCategory').textContent=card.cat;
+  document.getElementById('dailyFcCategoryBack').textContent=card.cat;
+  document.getElementById('dailyFcWord').textContent=card.es;
+  document.getElementById('dailyFcEnglish').textContent=card.en;
+  document.getElementById('dailyFcIpa').textContent=card.ipa;
+  document.getElementById('dailyFcIpaBack').textContent=card.ipa;
+  document.getElementById('dailyFcExample').textContent=card.ex;
+  document.getElementById('dailyFcExampleEn').textContent=card.exEn;
+  var tipEl=document.getElementById('dailyFcTip');
+  if(card.tip){tipEl.style.display='block';document.getElementById('dailyFcTipText').textContent=card.tip;}
+  else{tipEl.style.display='none';}
+  document.getElementById('dailyStudyCounter').textContent='Card '+(dailyStudyIndex+1)+' of '+dailyWords.length;
+}
+function flipDailyCard(){document.getElementById('dailyFlashcard').classList.toggle('flipped');}
+function speakDailyStudyWord(){var card=dailyWords[dailyStudyIndex];if(!card)return;var u=new SpeechSynthesisUtterance(card.es);u.lang='es-ES';u.rate=0.85;speechSynthesis.speak(u);}
+function nextDailyCard(){if(dailyStudyIndex<dailyWords.length-1){dailyStudyIndex++;renderDailyStudyCard();}else{document.getElementById('dailyComplete').style.display='block';checkAchievements();}}
+function prevDailyCard(){if(dailyStudyIndex>0){dailyStudyIndex--;renderDailyStudyCard();}}
+function markDailyCard(grade){
+  var card=dailyWords[dailyStudyIndex];
+  if(grade===0)mastery[card.es]=Math.max(0,mastery[card.es]);
+  else if(grade>=2)mastery[card.es]=Math.min(2,mastery[card.es]+1);
+  else mastery[card.es]=Math.max(1,mastery[card.es]);
+  srs[card.es]={nextReview:getNextReview(grade),lastGrade:grade,lastReviewed:today()};
+  saveProgress();updateStats();nextDailyCard();
+}
+function resetDailyStudy(){dailyStudyIndex=0;document.getElementById('dailyComplete').style.display='none';renderDailyStudyCard();}
+function updateDailyRing(){document.getElementById('dailyRingNum').textContent=dailyWords.length;}
+
+// INIT
+try{var oc=parseInt(localStorage.getItem('es_open_count')||'0')+1;localStorage.setItem('es_open_count',String(oc));}catch(e){}
+loadProgress();
+updateStats();
+updateStreakUI();
+renderCard();
+renderSentences();
+renderVerbSelector();
+renderVerbCard();
+loadQuizQuestion();
+loadListenQuestion();
+earnAchievement('hola');
+</script>
+</body>
+</html>
